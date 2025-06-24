@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/24 11:04:35 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/24 13:52:23 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,14 @@ typedef struct s_side_forks
 /* SPECIFIC PER-THREAD ARGUMENTS */
 typedef struct	s_thread_args
 {
-	t_philo			philo;
+	t_philo			*philo;
 	int				philo_num;
 	t_side_forks	side_forks;
 	struct timeval	started_eat;
 	struct timeval	started_sleep;
+	int				meals_eaten;
 	pthread_mutex_t	*mutex;
+	char			*forks;
 }				t_thread_args;
 
 /* HEAP TO FREE */

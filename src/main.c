@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/24 12:00:06 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/24 15:29:10 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,77 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// int	main(void)
-// {
-	// struct timeval starting_time;
-	// struct timeval curr_time;
-	// int	i = 0;
-//
-	// gettimeofday(&starting_time, NULL);
-	// while(i++ <= 20)
-	// {
-		// usleep(1000000);
-		// gettimeofday(&curr_time, NULL);
-		// printf("Diff: %lld\n", get_ms_diff(starting_time, curr_time));
-	// }
-// }
-
-// int	random_time()
-// {
-// 	srand((unsigned int)time(NULL));
-// 	return ((rand() % (8000000 - 1000000 + 1) + 1000000));
-// }
-
-
-// void	*routine(void *args)
-// {
-// 	t_philo *casted_args;
-// 	struct timeval curr_time;
-// 	int	ms_diff;
-
-// 	casted_args = (t_philo*)args;
-// 	gettimeofday(&curr_time, NULL);
-// 	printf("%d : I'm born at %lld ms from program launch\n" , casted_args->philo_num, get_ms_diff(casted_args->start_time, curr_time));
-// 	usleep(casted_args->rand_num);
-// 	while(1)
-// 	{
-// 		gettimeofday(&curr_time, NULL);
-// 		ms_diff = get_ms_diff(casted_args->start_time, curr_time);
-// 		if (ms_diff >= casted_args->tt_die)
-// 		{
-// 			printf("%d : I died at %d ms after program starting\n", casted_args->philo_num, ms_diff);
-// 			return (NULL);
-// 		}
-// 	}
-// 	return (NULL);
-// }
-
-// int	main(void)
-// {
-// 	pthread_t t1;
-// 	pthread_t t2;
-// 	struct timeval starting_time;
-// 	t_philo args1;
-// 	t_philo args2;
-
-// 	gettimeofday(&starting_time, NULL);
-// 	args1 = (t_philo){1, starting_time, 400, random_time()};
-// 	args2 = (t_philo){2, starting_time, 300, random_time()};
-// 	// usleep(1000000);
-// 	pthread_create(&t1, NULL, routine, &args1);
-// 	// usleep(1000000);
-// 	pthread_create(&t2, NULL, routine, &args2);
-// 	pthread_join(t1, NULL);
-// 	pthread_join(t2, NULL);
-// }
-
-// int	main(void)
-// {
-	// 	int i = random_time();
-	// 	printf("%d\n", i);
-	// 	usleep(i);
-	// }
-
 int	everybody_lives(t_thread_args *args)
 {
 	int	ms_diff;
@@ -97,17 +26,17 @@ int	everybody_lives(t_thread_args *args)
 	gettimeofday(&current_time, NULL);
 	ms_diff = get_ms_diff(args->started_eat, current_time);
 	pthread_mutex_lock(args->mutex);
-	if (args->philo.death_flag)
+	if (args->philo->death_flag)
 	{
 		pthread_mutex_unlock(args->mutex);
 		return (0);
 	}
-	if (ms_diff >= args->philo.tt_die)
+	if (ms_diff >= args->philo->tt_die)
 	{
-		args->philo.death_flag = 1;
+		args->philo->death_flag = 1;
 		pthread_mutex_unlock(args->mutex);
 		printf("%lld %d died\n",
-			curr_timestamp(args->philo.start_time), args->philo_num);
+			curr_timestamp(args->philo->start_time), args->philo_num);
 		return (0);
 	}
 	pthread_mutex_unlock(args->mutex);
@@ -117,12 +46,12 @@ int	everybody_lives(t_thread_args *args)
 int	try_left_fork(t_thread_args *args, int *holded_forks)
 {
 	pthread_mutex_lock(args->mutex);
-	if (args->side_forks.left)
+	if (args->forks[args->side_forks.left])
 	{
-		args->side_forks.left = 0;
+		args->forks[args->side_forks.left] = 0;
 		*holded_forks += 1;
 		printf("%lld %d has taken a fork\n",
-			curr_timestamp(args->philo.start_time), args->philo_num);
+			curr_timestamp(args->philo->start_time), args->philo_num);
 	}
 	pthread_mutex_unlock(args->mutex);
 	return (SUCCESS);
@@ -131,12 +60,12 @@ int	try_left_fork(t_thread_args *args, int *holded_forks)
 int	try_right_fork(t_thread_args *args, int *holded_forks)
 {
 	pthread_mutex_lock(args->mutex);
-	if (args->side_forks.right)
+	if (args->forks[args->side_forks.right])
 	{
-		args->side_forks.right = 0;
+		args->forks[args->side_forks.right] = 0;
 		*holded_forks += 1;
 		printf("%lld %d has taken a fork\n",
-			curr_timestamp(args->philo.start_time), args->philo_num);
+			curr_timestamp(args->philo->start_time), args->philo_num);
 	}
 	pthread_mutex_unlock(args->mutex);
 	return (SUCCESS);
@@ -145,9 +74,14 @@ int	try_right_fork(t_thread_args *args, int *holded_forks)
 int	drop_forks(t_thread_args *args)
 {
 	pthread_mutex_lock(args->mutex);
-	args->side_forks.left = 1;
-	args->side_forks.right = 1;
+	args->forks[args->side_forks.left] = 1;
+	args->forks[args->side_forks.right] = 1;
+	gettimeofday(&args->started_sleep, NULL);
+	printf("%lld %d is sleeping\n",
+		curr_timestamp(args->philo->start_time), args->philo_num);
 	pthread_mutex_unlock(args->mutex);
+	// printf("%lld %d dropped forks\n",
+	// 	curr_timestamp(args->philo->start_time), args->philo_num);
 	return (SUCCESS);
 }
 
@@ -158,24 +92,30 @@ int	start_thinking(t_thread_args *args)
 	holded_forks[0] = 0;
 	holded_forks[1] = 0;
 	printf("%lld %d is thinking\n",
-			curr_timestamp(args->philo.start_time), args->philo_num);
+			curr_timestamp(args->philo->start_time), args->philo_num);
 	while (!holded_forks[0] || !holded_forks[1])
 	{
 		if (!everybody_lives(args))
 			return (ERROR);
 		if (args->philo_num % 2 == 0)
 		{
+			// usleep(100000);
 			if (!holded_forks[1])
 				try_right_fork(args, &holded_forks[1]);
+			// usleep(1000);
 			if (!holded_forks[0])
 				try_left_fork(args, &holded_forks[0]);
+			// usleep(1000);
 		}
 		else
 		{
+			// usleep(50000);
 			if (!holded_forks[0])
 				try_left_fork(args, &holded_forks[0]);
+			// usleep(1000);
 			if (!holded_forks[1])
 				try_right_fork(args, &holded_forks[1]);
+			// usleep(1000);
 		}
 	}
 	return (SUCCESS);
@@ -185,29 +125,30 @@ int	start_eating(t_thread_args *args)
 {
 	gettimeofday(&args->started_eat, NULL);
 	printf("%lld %d is eating\n",
-		curr_timestamp(args->philo.start_time), args->philo_num);
+		curr_timestamp(args->philo->start_time), args->philo_num);
 	while (1)
 	{
 		if (!everybody_lives(args))
 			return (ERROR);
-		if (curr_timestamp(args->started_eat) >= args->philo.tt_eat)
+		if (curr_timestamp(args->started_eat) >= args->philo->tt_eat)
 			break ;
 		usleep(10);
 	}
 	drop_forks(args);
+	args->meals_eaten++;
 	return (SUCCESS);
 }
 
 int	start_sleeping(t_thread_args *args)
 {
-	gettimeofday(&args->started_sleep, NULL);
-	printf("%lld %d is sleeping\n",
-		curr_timestamp(args->philo.start_time), args->philo_num);
+	// gettimeofday(&args->started_sleep, NULL);
+	// printf("%lld %d is sleeping\n",
+	// 	curr_timestamp(args->philo->start_time), args->philo_num);
 	while (1)
 	{
 		if (!everybody_lives(args))
 			return (ERROR);
-		if (curr_timestamp(args->started_sleep) >= args->philo.tt_sleep)
+		if (curr_timestamp(args->started_sleep) >= args->philo->tt_sleep)
 			break ;
 		usleep(10);
 	}
@@ -221,6 +162,9 @@ void	*routine(void *args_struct)
 	args = (t_thread_args *)args_struct;
 	while (1)
 	{
+		if (args->philo->eat_max != -1
+				&& args->meals_eaten == args->philo->eat_max)
+			return (NULL);
 		if (start_thinking(args) == ERROR)
 			return (NULL);
 		if (start_eating(args) == ERROR)
@@ -256,12 +200,14 @@ int	create_threads(t_philo *philo, int total_philo, t_heap_allocated *heap, pthr
 		side_forks = set_forks(philo_num, total_philo);
 		heap->thread_args[philo_num] = (t_thread_args)
 		{
-			*philo,
+			philo,
 			philo_num + 1,
 			side_forks,
 			philo->start_time,
 			(struct timeval){0},
-			mutex
+			0,
+			mutex,
+			heap->forks
 		};
 		pthread_create(&heap->thread_lst[philo_num],
 			NULL,
