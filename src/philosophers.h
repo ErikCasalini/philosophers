@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/24 08:51:58 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/24 11:04:35 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,9 @@ typedef struct	s_thread_args
 	t_philo			philo;
 	int				philo_num;
 	t_side_forks	side_forks;
+	struct timeval	started_eat;
+	struct timeval	started_sleep;
+	pthread_mutex_t	*mutex;
 }				t_thread_args;
 
 /* HEAP TO FREE */
@@ -74,6 +77,7 @@ t_side_forks	set_forks(int current_philo, int philo_num);
 
 /*UTILS*/
 long long		get_ms_diff(struct timeval start, struct timeval current);
+long long		curr_timestamp(struct timeval start_time);
 t_intf			ft_atoi_flag(char *str);
 
 /* FREE UTILS */
