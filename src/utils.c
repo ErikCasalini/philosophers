@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:35:35 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 10:49:34 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 17:07:44 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,6 @@ void	mutex_printf(char *str, t_thread_args *args)
 {
 	pthread_mutex_lock(args->philo->death_mutex);
 	if (!args->philo->death_flag)
-	{
-		// pthread_mutex_lock(args->philo->print_mutex);
 		printf(str, curr_timestamp(args->philo->start_time), args->philo_num);
-		// pthread_mutex_unlock(args->philo->print_mutex);
-	}
 	pthread_mutex_unlock(args->philo->death_mutex);
 }

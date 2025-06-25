@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   data_init_tools.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 10:20:18 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 17:17:09 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static int	check_and_set_arg(char *arg, int *philo_param)
 	return (SUCCESS);
 }
 
-int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex, pthread_mutex_t *print_mutex)
+int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex, pthread_mutex_t *sync_mutex)
 {
 	if (check_and_set_arg(argv[2], &philo->tt_die) == ERROR)
 		return (ERROR);
@@ -40,17 +40,17 @@ int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *de
 	}
 	else
 		philo->eat_max = -1;
-	gettimeofday(&philo->start_time, NULL);
 	philo->death_flag = 0;
 	philo->death_mutex = death_mutex;
-	philo->print_mutex = print_mutex;
+	philo->sync_mutex = sync_mutex;
+	philo->threads_ready = 0;
 	return (SUCCESS);
 }
 
-int init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex, pthread_mutex_t *print_mutex)
+int init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex, pthread_mutex_t *sync_mutex)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < total_philo)
 	{
@@ -58,7 +58,7 @@ int init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *dea
 		i++;
 	}
 	pthread_mutex_init(death_mutex, NULL);
-	pthread_mutex_init(print_mutex, NULL);
+	pthread_mutex_init(sync_mutex, NULL);
 	return (SUCCESS);
 }
 
