@@ -1,30 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free_utils.c                                       :+:      :+:    :+:   */
+/*   cleaning_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/24 08:36:35 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 07:35:24 by ecasalin         ###   ########.fr       */
+/*   Created: 2025/06/25 07:32:03 by ecasalin          #+#    #+#             */
+/*   Updated: 2025/06/25 07:54:53 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-#include "stdlib.h"
-#include "stdio.h"
+#include <pthread.h>
 
-void	free_heap(t_heap_allocated *heap)
+int	destroy_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex)
 {
-	free(heap->forks);
-	free(heap->thread_args);
-	free(heap->thread_lst);
-	free(heap->mutexes);
+	int	i;
+
+	i = 0;
+	while (i < total_philo)
+	{
+		pthread_mutex_destroy(&mutexes[i]);
+		i++;
+	}
+	pthread_mutex_destroy(death_mutex);
+	return (SUCCESS);
 }
 
-int	free_heap_exit_err(t_heap_allocated *heap)
+int	join_threads(pthread_t *thread_lst, int total_philo)
 {
-	free_heap(heap);
-	printf("Internal error occurred\n");
-	exit(1);
+	int	i;
+
+	i = 0;
+	while (i < total_philo)
+	{
+		pthread_join(thread_lst[i], NULL);
+		i++;
+	}
+	return (SUCCESS);
 }

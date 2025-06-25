@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/24 15:29:10 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 08:47:29 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,32 +20,32 @@
 
 int	everybody_lives(t_thread_args *args)
 {
-	int	ms_diff;
+	int				ms_diff;
 	struct timeval current_time;
 
 	gettimeofday(&current_time, NULL);
 	ms_diff = get_ms_diff(args->started_eat, current_time);
-	pthread_mutex_lock(args->mutex);
+	pthread_mutex_lock(args->philo->death_mutex);
 	if (args->philo->death_flag)
 	{
-		pthread_mutex_unlock(args->mutex);
+		pthread_mutex_unlock(args->philo->death_mutex);
 		return (0);
 	}
 	if (ms_diff >= args->philo->tt_die)
 	{
 		args->philo->death_flag = 1;
-		pthread_mutex_unlock(args->mutex);
+		pthread_mutex_unlock(args->philo->death_mutex);
 		printf("%lld %d died\n",
 			curr_timestamp(args->philo->start_time), args->philo_num);
 		return (0);
 	}
-	pthread_mutex_unlock(args->mutex);
+	pthread_mutex_unlock(args->philo->death_mutex);
 	return (1);
 }
 
 int	try_left_fork(t_thread_args *args, int *holded_forks)
 {
-	pthread_mutex_lock(args->mutex);
+	pthread_mutex_lock(&args->mutexes[args->side_forks.left]);
 	if (args->forks[args->side_forks.left])
 	{
 		args->forks[args->side_forks.left] = 0;
@@ -53,13 +53,13 @@ int	try_left_fork(t_thread_args *args, int *holded_forks)
 		printf("%lld %d has taken a fork\n",
 			curr_timestamp(args->philo->start_time), args->philo_num);
 	}
-	pthread_mutex_unlock(args->mutex);
+	pthread_mutex_unlock(&args->mutexes[args->side_forks.left]);
 	return (SUCCESS);
 }
 
 int	try_right_fork(t_thread_args *args, int *holded_forks)
 {
-	pthread_mutex_lock(args->mutex);
+	pthread_mutex_lock(&args->mutexes[args->side_forks.right]);
 	if (args->forks[args->side_forks.right])
 	{
 		args->forks[args->side_forks.right] = 0;
@@ -67,19 +67,19 @@ int	try_right_fork(t_thread_args *args, int *holded_forks)
 		printf("%lld %d has taken a fork\n",
 			curr_timestamp(args->philo->start_time), args->philo_num);
 	}
-	pthread_mutex_unlock(args->mutex);
+	pthread_mutex_unlock(&args->mutexes[args->side_forks.right]);
 	return (SUCCESS);
 }
 
 int	drop_forks(t_thread_args *args)
 {
-	pthread_mutex_lock(args->mutex);
+	pthread_mutex_lock(&args->mutexes[args->side_forks.left]);
 	args->forks[args->side_forks.left] = 1;
+	pthread_mutex_unlock(&args->mutexes[args->side_forks.left]);
+	pthread_mutex_lock(&args->mutexes[args->side_forks.right]);
 	args->forks[args->side_forks.right] = 1;
+	pthread_mutex_unlock(&args->mutexes[args->side_forks.right]);
 	gettimeofday(&args->started_sleep, NULL);
-	printf("%lld %d is sleeping\n",
-		curr_timestamp(args->philo->start_time), args->philo_num);
-	pthread_mutex_unlock(args->mutex);
 	// printf("%lld %d dropped forks\n",
 	// 	curr_timestamp(args->philo->start_time), args->philo_num);
 	return (SUCCESS);
@@ -102,7 +102,7 @@ int	start_thinking(t_thread_args *args)
 			// usleep(100000);
 			if (!holded_forks[1])
 				try_right_fork(args, &holded_forks[1]);
-			// usleep(1000);
+			usleep(1000);
 			if (!holded_forks[0])
 				try_left_fork(args, &holded_forks[0]);
 			// usleep(1000);
@@ -112,7 +112,7 @@ int	start_thinking(t_thread_args *args)
 			// usleep(50000);
 			if (!holded_forks[0])
 				try_left_fork(args, &holded_forks[0]);
-			// usleep(1000);
+			usleep(1000);
 			if (!holded_forks[1])
 				try_right_fork(args, &holded_forks[1]);
 			// usleep(1000);
@@ -141,9 +141,9 @@ int	start_eating(t_thread_args *args)
 
 int	start_sleeping(t_thread_args *args)
 {
-	// gettimeofday(&args->started_sleep, NULL);
-	// printf("%lld %d is sleeping\n",
-	// 	curr_timestamp(args->philo->start_time), args->philo_num);
+	gettimeofday(&args->started_sleep, NULL);
+	printf("%lld %d is sleeping\n",
+		curr_timestamp(args->philo->start_time), args->philo_num);
 	while (1)
 	{
 		if (!everybody_lives(args))
@@ -176,20 +176,7 @@ void	*routine(void *args_struct)
 	return (NULL);
 }
 
-int	join_threads(pthread_t *thread_lst, int total_philo)
-{
-	int	i;
-
-	i = 0;
-	while (i < total_philo)
-	{
-		pthread_join(thread_lst[i], NULL);
-		i++;
-	}
-	return (SUCCESS);
-}
-
-int	create_threads(t_philo *philo, int total_philo, t_heap_allocated *heap, pthread_mutex_t *mutex)
+int	create_threads(t_philo *philo, int total_philo, t_heap_allocated *heap)
 {
 	int				philo_num;
 	t_side_forks	side_forks;
@@ -204,10 +191,10 @@ int	create_threads(t_philo *philo, int total_philo, t_heap_allocated *heap, pthr
 			philo_num + 1,
 			side_forks,
 			philo->start_time,
-			(struct timeval){0},
+			(struct timeval){0, 0},
 			0,
-			mutex,
-			heap->forks
+			heap->forks,
+			heap->mutexes
 		};
 		pthread_create(&heap->thread_lst[philo_num],
 			NULL,
@@ -223,22 +210,27 @@ int	main(int argc, char *argv[])
 	t_philo				philo;
 	t_intf				total_philo;
 	t_heap_allocated	heap;
-	pthread_mutex_t		mutex;
-	/* HAVE TO FIX ATOI : -> r1234 should not work */
+	pthread_mutex_t		death_mutex;
+	
 	if (argc < 5 || argc > 6)
 		exit_bad_argument();
-	heap = (t_heap_allocated){NULL, NULL, NULL};
-	total_philo = ft_atoi_flag(argv[1]);
+		
+	heap = (t_heap_allocated){NULL, NULL, NULL, NULL};
+	
+	total_philo = ft_atoi_flag(argv[1]); // --> HAVE TO FIX ATOI : -> r1234 should not work //
 	if (total_philo.flag == ERROR)
 		exit_bad_argument();
-	if (init_philo_struct(argc, argv, &philo) == ERROR)
+		
+	if (init_philo_struct(argc, argv, &philo, &death_mutex) == ERROR)
 		exit_bad_argument();
 	if (allocate_heap(&heap, total_philo.value) == ERROR)
 		free_heap_exit_err(&heap);
-	pthread_mutex_init(&mutex, NULL);
-	create_threads(&philo, total_philo.value, &heap, &mutex);
+		
+	init_mutexes(heap.mutexes, total_philo.value, &death_mutex);
+	create_threads(&philo, total_philo.value, &heap);
+	
 	join_threads(heap.thread_lst, total_philo.value);
-	pthread_mutex_destroy(&mutex);
+	destroy_mutexes(heap.mutexes, total_philo.value, &death_mutex);
 	free_heap(&heap);
 	return (0);
 }

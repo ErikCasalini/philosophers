@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   data_init_tools.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/24 08:49:51 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 07:53:23 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static int	check_and_set_arg(char *arg, int *philo_param)
 	return (SUCCESS);
 }
 
-int	init_philo_struct(int argc, char **argv, t_philo *philo)
+int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex)
 {
 	if (check_and_set_arg(argv[2], &philo->tt_die) == ERROR)
 		return (ERROR);
@@ -42,6 +42,21 @@ int	init_philo_struct(int argc, char **argv, t_philo *philo)
 		philo->eat_max = -1;
 	gettimeofday(&philo->start_time, NULL);
 	philo->death_flag = 0;
+	philo->death_mutex = death_mutex;
+	return (SUCCESS);
+}
+
+int init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex)
+{
+	int	i;
+	
+	i = 0;
+	while (i < total_philo)
+	{
+		pthread_mutex_init(&mutexes[i], NULL);
+		i++;
+	}
+	pthread_mutex_init(death_mutex, NULL);
 	return (SUCCESS);
 }
 

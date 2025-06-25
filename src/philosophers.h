@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/24 13:52:23 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 07:55:18 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ typedef struct s_philo
 	int				tt_sleep;
 	int				eat_max;
 	char			death_flag;
+	pthread_mutex_t	*death_mutex;
 }				t_philo;
 
 /* PHILOSPHER'S FORKS */
@@ -55,14 +56,15 @@ typedef struct	s_thread_args
 	struct timeval	started_eat;
 	struct timeval	started_sleep;
 	int				meals_eaten;
-	pthread_mutex_t	*mutex;
 	char			*forks;
+	pthread_mutex_t	*mutexes;
 }				t_thread_args;
 
 /* HEAP TO FREE */
 typedef struct	s_heap_allocated
 {
 	char			*forks;
+	pthread_mutex_t	*mutexes;
 	pthread_t		*thread_lst;
 	t_thread_args	*thread_args;
 }				t_heap_allocated;
@@ -72,10 +74,12 @@ int				allocate_heap(t_heap_allocated *heap, int philo_num);
 char			*alloc_forks_array(int fork_num);
 pthread_t		*alloc_thread_lst(int thread_num);
 t_thread_args	*alloc_thread_args(int thread_num);
+pthread_mutex_t	*alloc_mutexes_array(int mutexes_num);
 
 /* DATA INITIALISATION UTILS */
-int				init_philo_struct(int argc, char **argv, t_philo *philo);
+int				init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex);
 t_side_forks	set_forks(int current_philo, int philo_num);
+int				init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex);
 
 /*UTILS*/
 long long		get_ms_diff(struct timeval start, struct timeval current);
@@ -88,5 +92,9 @@ int				free_heap_exit_err(t_heap_allocated *heap);
 
 /* ARGUMENTS ERRORS UTILS */
 void			exit_bad_argument(void);
+
+/* CLEANING UTILS */
+int	destroy_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex);
+int	join_threads(pthread_t *thread_lst, int total_philo);
 
 #endif
