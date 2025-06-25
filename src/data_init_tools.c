@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:17:09 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 17:22:09 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *de
 	philo->death_flag = 0;
 	philo->death_mutex = death_mutex;
 	philo->sync_mutex = sync_mutex;
-	philo->threads_ready = 0;
 	return (SUCCESS);
 }
 

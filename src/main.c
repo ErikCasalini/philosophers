@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:17:09 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 17:24:44 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ void	*routine(void *args_struct)
 	pthread_mutex_lock(args->philo->sync_mutex);
 	pthread_mutex_unlock(args->philo->sync_mutex);
 	args->started_eat = args->philo->start_time;
-	if (args->philo_num % 2 == 0)
+	if (args->philo_num % 2 == 0 || (args->philo->total_philo % 2 == 1 && args->philo->total_philo == args->philo_num))
 		if (start_sleeping(args) == ERROR)
 			return (NULL);
 	while (1)
@@ -213,6 +213,7 @@ int	main(int argc, char *argv[])
 	if (total_philo.flag == ERROR)
 		exit_bad_argument();
 
+	philo.total_philo = total_philo.value;
 	if (init_philo_struct(argc, argv, &philo, &death_mutex, &sync_mutex) == ERROR)
 		exit_bad_argument();
 	if (allocate_heap(&heap, total_philo.value) == ERROR)

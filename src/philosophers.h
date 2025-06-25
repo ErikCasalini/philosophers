@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:17:09 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 17:22:17 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,10 @@ typedef struct s_philo
 	int				tt_eat;
 	int				tt_sleep;
 	int				eat_max;
+	int				total_philo;
 	char			death_flag;
 	pthread_mutex_t	*death_mutex;
 	pthread_mutex_t	*sync_mutex;
-	int				threads_ready;
 }				t_philo;
 
 /* PHILOSPHER'S FORKS */
