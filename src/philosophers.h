@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 07:55:18 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 10:20:50 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_philo
 	int				eat_max;
 	char			death_flag;
 	pthread_mutex_t	*death_mutex;
+	pthread_mutex_t	*print_mutex;
 }				t_philo;
 
 /* PHILOSPHER'S FORKS */
@@ -77,9 +78,9 @@ t_thread_args	*alloc_thread_args(int thread_num);
 pthread_mutex_t	*alloc_mutexes_array(int mutexes_num);
 
 /* DATA INITIALISATION UTILS */
-int				init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex);
+int				init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex, pthread_mutex_t *print_mutex);
 t_side_forks	set_forks(int current_philo, int philo_num);
-int				init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex);
+int				init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex, pthread_mutex_t *print_mutex);
 
 /*UTILS*/
 long long		get_ms_diff(struct timeval start, struct timeval current);
@@ -94,7 +95,7 @@ int				free_heap_exit_err(t_heap_allocated *heap);
 void			exit_bad_argument(void);
 
 /* CLEANING UTILS */
-int	destroy_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex);
+int	destroy_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex, pthread_mutex_t *print_mutex);
 int	join_threads(pthread_t *thread_lst, int total_philo);
 
 #endif

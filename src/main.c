@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 08:47:29 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/25 10:27:50 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,10 @@ int	everybody_lives(t_thread_args *args)
 	{
 		args->philo->death_flag = 1;
 		pthread_mutex_unlock(args->philo->death_mutex);
+		pthread_mutex_lock(args->philo->print_mutex);
 		printf("%lld %d died\n",
 			curr_timestamp(args->philo->start_time), args->philo_num);
+		pthread_mutex_unlock(args->philo->print_mutex);
 		return (0);
 	}
 	pthread_mutex_unlock(args->philo->death_mutex);
@@ -50,8 +52,10 @@ int	try_left_fork(t_thread_args *args, int *holded_forks)
 	{
 		args->forks[args->side_forks.left] = 0;
 		*holded_forks += 1;
+		pthread_mutex_lock(args->philo->print_mutex);
 		printf("%lld %d has taken a fork\n",
 			curr_timestamp(args->philo->start_time), args->philo_num);
+		pthread_mutex_unlock(args->philo->print_mutex);
 	}
 	pthread_mutex_unlock(&args->mutexes[args->side_forks.left]);
 	return (SUCCESS);
@@ -64,8 +68,10 @@ int	try_right_fork(t_thread_args *args, int *holded_forks)
 	{
 		args->forks[args->side_forks.right] = 0;
 		*holded_forks += 1;
+		pthread_mutex_lock(args->philo->print_mutex);
 		printf("%lld %d has taken a fork\n",
 			curr_timestamp(args->philo->start_time), args->philo_num);
+		pthread_mutex_unlock(args->philo->print_mutex);
 	}
 	pthread_mutex_unlock(&args->mutexes[args->side_forks.right]);
 	return (SUCCESS);
@@ -91,8 +97,10 @@ int	start_thinking(t_thread_args *args)
 
 	holded_forks[0] = 0;
 	holded_forks[1] = 0;
+	pthread_mutex_lock(args->philo->print_mutex);
 	printf("%lld %d is thinking\n",
 			curr_timestamp(args->philo->start_time), args->philo_num);
+	pthread_mutex_unlock(args->philo->print_mutex);
 	while (!holded_forks[0] || !holded_forks[1])
 	{
 		if (!everybody_lives(args))
@@ -102,7 +110,7 @@ int	start_thinking(t_thread_args *args)
 			// usleep(100000);
 			if (!holded_forks[1])
 				try_right_fork(args, &holded_forks[1]);
-			usleep(1000);
+			// usleep(1000);
 			if (!holded_forks[0])
 				try_left_fork(args, &holded_forks[0]);
 			// usleep(1000);
@@ -112,7 +120,7 @@ int	start_thinking(t_thread_args *args)
 			// usleep(50000);
 			if (!holded_forks[0])
 				try_left_fork(args, &holded_forks[0]);
-			usleep(1000);
+			// usleep(1000);
 			if (!holded_forks[1])
 				try_right_fork(args, &holded_forks[1]);
 			// usleep(1000);
@@ -124,8 +132,10 @@ int	start_thinking(t_thread_args *args)
 int	start_eating(t_thread_args *args)
 {
 	gettimeofday(&args->started_eat, NULL);
+	pthread_mutex_lock(args->philo->print_mutex);
 	printf("%lld %d is eating\n",
 		curr_timestamp(args->philo->start_time), args->philo_num);
+	pthread_mutex_unlock(args->philo->print_mutex);
 	while (1)
 	{
 		if (!everybody_lives(args))
@@ -142,8 +152,10 @@ int	start_eating(t_thread_args *args)
 int	start_sleeping(t_thread_args *args)
 {
 	gettimeofday(&args->started_sleep, NULL);
+	pthread_mutex_lock(args->philo->print_mutex);
 	printf("%lld %d is sleeping\n",
 		curr_timestamp(args->philo->start_time), args->philo_num);
+	pthread_mutex_unlock(args->philo->print_mutex);
 	while (1)
 	{
 		if (!everybody_lives(args))
@@ -211,6 +223,7 @@ int	main(int argc, char *argv[])
 	t_intf				total_philo;
 	t_heap_allocated	heap;
 	pthread_mutex_t		death_mutex;
+	pthread_mutex_t		print_mutex;
 	
 	if (argc < 5 || argc > 6)
 		exit_bad_argument();
@@ -221,16 +234,16 @@ int	main(int argc, char *argv[])
 	if (total_philo.flag == ERROR)
 		exit_bad_argument();
 		
-	if (init_philo_struct(argc, argv, &philo, &death_mutex) == ERROR)
+	if (init_philo_struct(argc, argv, &philo, &death_mutex, &print_mutex) == ERROR)
 		exit_bad_argument();
 	if (allocate_heap(&heap, total_philo.value) == ERROR)
 		free_heap_exit_err(&heap);
 		
-	init_mutexes(heap.mutexes, total_philo.value, &death_mutex);
+	init_mutexes(heap.mutexes, total_philo.value, &death_mutex, &print_mutex);
 	create_threads(&philo, total_philo.value, &heap);
 	
 	join_threads(heap.thread_lst, total_philo.value);
-	destroy_mutexes(heap.mutexes, total_philo.value, &death_mutex);
+	destroy_mutexes(heap.mutexes, total_philo.value, &death_mutex, &print_mutex);
 	free_heap(&heap);
 	return (0);
 }
