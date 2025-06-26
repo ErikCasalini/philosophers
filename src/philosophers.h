@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:22:17 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 08:36:36 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct s_philo
 	int				tt_die;
 	int				tt_eat;
 	int				tt_sleep;
+	int				tt_think;
 	int				eat_max;
 	int				total_philo;
 	char			death_flag;
@@ -55,9 +56,11 @@ typedef struct	s_thread_args
 	t_philo			*philo;
 	int				philo_num;
 	t_side_forks	side_forks;
+	struct timeval	started_think;
 	struct timeval	started_eat;
 	struct timeval	started_sleep;
 	int				meals_eaten;
+	int				last_philo_tracker;
 	char			*forks;
 	pthread_mutex_t	*mutexes;
 }				t_thread_args;

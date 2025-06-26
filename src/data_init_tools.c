@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   data_init_tools.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:22:09 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 08:15:06 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ static int	check_and_set_arg(char *arg, int *philo_param)
 	else
 		*philo_param = temp_atoi.value;
 	return (SUCCESS);
+}
+
+int	init_tt_think(int tt_eat, int tt_sleep)
+{
+	if (tt_eat < tt_sleep)
+		return (0);
+	else
+		return (tt_eat - tt_sleep);
 }
 
 int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex, pthread_mutex_t *sync_mutex)
@@ -43,6 +51,7 @@ int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *de
 	philo->death_flag = 0;
 	philo->death_mutex = death_mutex;
 	philo->sync_mutex = sync_mutex;
+	philo->tt_think = init_tt_think(philo->tt_eat, philo->tt_sleep);
 	return (SUCCESS);
 }
 

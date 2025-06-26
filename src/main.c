@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:24:44 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 10:01:26 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,21 +78,53 @@ int	drop_forks(t_thread_args *args)
 	args->forks[args->side_forks.right] = 1;
 	pthread_mutex_unlock(&args->mutexes[args->side_forks.right]);
 	gettimeofday(&args->started_sleep, NULL);
-	// printf("%lld %d dropped forks\n",
-	// 	curr_timestamp(args->philo->start_time), args->philo_num);
 	return (SUCCESS);
 }
 
-int	start_thinking(t_thread_args *args)
+int	wait_your_turn(t_thread_args *args)
+{
+	gettimeofday(&args->started_think, NULL);
+	while (1)
+	{
+		if (!everybody_lives(args))
+			return (ERROR);
+		if (curr_timestamp(args->started_think) >= args->philo->tt_think)
+			break ;
+		usleep(10);
+	}
+	return (SUCCESS);
+}
+
+int	is_last_to_eat(t_thread_args *args, int last_to_eat_tracker)
+{
+	if (args->philo_num + last_to_eat_tracker == args->philo->total_philo)
+		return (1);
+	return (0);
+}
+
+int	start_thinking(t_thread_args *args, int last_to_eat_tracker)
 {
 	int	holded_forks[2];
-
+	
 	holded_forks[0] = 0;
 	holded_forks[1] = 0;
 	mutex_printf("%lld %d is thinking\n", args);
-	if (args->philo->tt_sleep == 0)
-		if (args->philo_num % 2 == 0)
-			usleep((args->philo->tt_eat / 2) * 1000);
+	if (last_to_eat_tracker % 2 == 0)
+	{
+		if (args->philo->tt_think != 0
+			&& args->philo_num % 2 == 1
+			|| is_last_to_eat(args, last_to_eat_tracker))
+			if (wait_your_turn(args) == ERROR)
+				return (ERROR);
+	}
+	else if (last_to_eat_tracker % 2 == 1)
+	{
+		if (args->philo->tt_think != 0
+			&& args->philo_num % 2 == 0
+			|| is_last_to_eat(args, last_to_eat_tracker))
+			if (wait_your_turn(args) == ERROR)
+				return (ERROR);
+	}
 	while (!holded_forks[0] || !holded_forks[1])
 	{
 		if (!everybody_lives(args))
@@ -139,28 +171,36 @@ int	start_sleeping(t_thread_args *args)
 
 void	*routine(void *args_struct)
 {
-	t_thread_args *args;
+	int				last_to_eat_tracker;
+	t_thread_args	*args;
 
 	args = (t_thread_args *)args_struct;
 	pthread_mutex_lock(args->philo->sync_mutex);
 	pthread_mutex_unlock(args->philo->sync_mutex);
+	last_to_eat_tracker = 0;
 	args->started_eat = args->philo->start_time;
-	if (args->philo_num % 2 == 0 || (args->philo->total_philo % 2 == 1 && args->philo->total_philo == args->philo_num))
-		if (start_sleeping(args) == ERROR)
-			return (NULL);
+	if (args->philo->tt_think == 0)
+	{
+		if (args->philo_num % 2 == 0 || is_last_to_eat(args, last_to_eat_tracker))
+			if (start_sleeping(args) == ERROR)
+				return (NULL);
+		last_to_eat_tracker++;
+	}
 	while (1)
 	{
 		if (args->philo->eat_max != -1
 				&& args->meals_eaten == args->philo->eat_max)
 			return (NULL);
-		if (start_thinking(args) == ERROR)
+		if (start_thinking(args, last_to_eat_tracker) == ERROR)
 			return (NULL);
 		if (start_eating(args) == ERROR)
 			return (NULL);
 		if (start_sleeping(args) == ERROR)
 			return (NULL);
+		last_to_eat_tracker++;
+		if (last_to_eat_tracker == args->philo->total_philo)
+			last_to_eat_tracker = 0;
 	}
-	// printf("p_num:%d, my forks are left=%d and right=%d, ttd: %d, tte: %d, tts: %d, eat_max: %d\n", args->philo_num, args->side_forks.left, args->side_forks.right, args->philo.tt_die, args->philo.tt_eat, args->philo.tt_sleep, args->philo.eat_max);
 	return (NULL);
 }
 
@@ -181,6 +221,8 @@ int	create_threads(t_philo *philo, int total_philo, t_heap_allocated *heap)
 			side_forks,
 			(struct timeval){0, 0},
 			(struct timeval){0, 0},
+			(struct timeval){0, 0},
+			0,
 			0,
 			heap->forks,
 			heap->mutexes
