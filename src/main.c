@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 10:56:09 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 11:34:44 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int	wait_your_turn(t_thread_args *args)
 			return (ERROR);
 		if (curr_timestamp(args->started_think) >= args->philo->tt_think)
 			break ;
-		usleep(250);
+		usleep(10);
 	}
 	return (SUCCESS);
 }
@@ -113,7 +113,7 @@ int	start_thinking(t_thread_args *args, int last_to_eat_tracker)
 	{
 		if (args->philo->tt_think != 0
 			&& args->philo_num % 2 == 1
-			|| is_last_to_eat(args, last_to_eat_tracker))
+			|| (is_last_to_eat(args, last_to_eat_tracker) && args->philo->total_philo % 2 == 1))
 			if (wait_your_turn(args) == ERROR)
 				return (ERROR);
 	}
@@ -121,7 +121,7 @@ int	start_thinking(t_thread_args *args, int last_to_eat_tracker)
 	{
 		if (args->philo->tt_think != 0
 			&& args->philo_num % 2 == 0
-			|| is_last_to_eat(args, last_to_eat_tracker))
+			|| (is_last_to_eat(args, last_to_eat_tracker) && args->philo->total_philo % 2 == 1))
 			if (wait_your_turn(args) == ERROR)
 				return (ERROR);
 	}
@@ -147,7 +147,7 @@ int	start_eating(t_thread_args *args)
 			return (ERROR);
 		if (curr_timestamp(args->started_eat) >= args->philo->tt_eat)
 			break ;
-		usleep(250);
+		usleep(10);
 	}
 	drop_forks(args);
 	args->meals_eaten++;
@@ -164,7 +164,7 @@ int	start_sleeping(t_thread_args *args)
 			return (ERROR);
 		if (curr_timestamp(args->started_sleep) >= args->philo->tt_sleep)
 			break ;
-		usleep(250);
+		usleep(10);
 	}
 	return (SUCCESS);
 }
@@ -181,7 +181,7 @@ void	*routine(void *args_struct)
 	args->started_eat = args->philo->start_time;
 	if (args->philo->tt_think == 0)
 	{
-		if (args->philo_num % 2 == 0 || is_last_to_eat(args, last_to_eat_tracker))
+		if (args->philo_num % 2 == 0 || (is_last_to_eat(args, last_to_eat_tracker) && args->philo->total_philo % 2 == 1))
 			if (start_sleeping(args) == ERROR)
 				return (NULL);
 		last_to_eat_tracker++;
