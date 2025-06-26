@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 15:49:21 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 16:45:15 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,16 +182,20 @@ void	*routine(void *args_struct)
 	args->started_eat = args->philo->start_time;
 	if (args->philo->tt_think == 0)
 	{
-		if (args->philo_num % 2 == 0 || (is_last_to_eat(args, last_to_eat_tracker) && args->philo->total_philo % 2 == 1))
+		if (args->philo_num % 2 == 0)
 			if (start_sleeping(args) == ERROR)
 				return (NULL);
-		last_to_eat_tracker++;
 	}
 	while (1)
 	{
 		if (args->philo->eat_max != -1
 				&& args->meals_eaten == args->philo->eat_max)
 			return (NULL);
+		if (args->philo->tt_think == 0 && args->philo->total_philo % 2 == 1 && is_last_to_eat(args, last_to_eat_tracker))
+		{
+			if (start_sleeping(args) == ERROR)
+				return (NULL);
+		}
 		if (start_thinking(args, last_to_eat_tracker) == ERROR)
 			return (NULL);
 		if (start_eating(args) == ERROR)
