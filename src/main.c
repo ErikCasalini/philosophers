@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 10:01:26 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 10:56:09 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int	wait_your_turn(t_thread_args *args)
 			return (ERROR);
 		if (curr_timestamp(args->started_think) >= args->philo->tt_think)
 			break ;
-		usleep(10);
+		usleep(250);
 	}
 	return (SUCCESS);
 }
@@ -147,7 +147,7 @@ int	start_eating(t_thread_args *args)
 			return (ERROR);
 		if (curr_timestamp(args->started_eat) >= args->philo->tt_eat)
 			break ;
-		usleep(10);
+		usleep(250);
 	}
 	drop_forks(args);
 	args->meals_eaten++;
@@ -164,7 +164,7 @@ int	start_sleeping(t_thread_args *args)
 			return (ERROR);
 		if (curr_timestamp(args->started_sleep) >= args->philo->tt_sleep)
 			break ;
-		usleep(10);
+		usleep(250);
 	}
 	return (SUCCESS);
 }

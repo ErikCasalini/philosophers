@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 08:36:36 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 10:18:47 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,20 @@
 
 # define ERROR 1
 # define SUCCESS 0
-# define INVALID 1
-# define OVERFLOW 2
 
 /* ATOI FLAG */
+typedef enum e_atoif
+{
+	success,
+	negative,
+	invalid,
+	overflow
+}			t_atoif;
+
 typedef struct s_intf
 {
 	int		value;
-	char	flag;
+	t_atoif	flag;
 }				t_intf;
 
 /* COMMON PHILOSPHER DATA */
