@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 10:18:47 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:40:17 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ long long		get_ms_diff(struct timeval start, struct timeval current);
 long long		curr_timestamp(struct timeval start_time);
 t_intf			ft_atoi_flag(char *str);
 void			mutex_printf(char *str, t_thread_args *args);
+void			ft_usleep(int ms);
 
 /* FREE UTILS */
 void			free_heap(t_heap_allocated *heap);

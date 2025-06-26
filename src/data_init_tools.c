@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 08:15:06 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:46:23 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int	init_tt_think(int tt_eat, int tt_sleep)
 		return (0);
 	else
 		return (tt_eat - tt_sleep);
+	// return ((tt_eat * 2) - tt_sleep);
 }
 
 int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex, pthread_mutex_t *sync_mutex)

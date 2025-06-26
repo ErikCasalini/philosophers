@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:35:35 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:07:44 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:40:31 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 #include <stdio.h>
+#include <unistd.h>
 
 long long	get_ms_diff(struct timeval start, struct timeval current)
 {
@@ -28,6 +29,17 @@ long long	curr_timestamp(struct timeval start_time)
 
 	gettimeofday(&current_time, NULL);
 	return (get_ms_diff(start_time, current_time));
+}
+
+void	ft_usleep(int ms)
+{
+	long long temp;
+	struct timeval start;
+	
+	gettimeofday(&start, NULL);
+	temp = curr_timestamp(start);
+	while ((curr_timestamp(start) - temp) < ms)
+		usleep(100);
 }
 
 void	mutex_printf(char *str, t_thread_args *args)
