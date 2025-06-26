@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 13:42:27 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/26 15:49:21 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ int	is_last_to_eat(t_thread_args *args, int last_to_eat_tracker)
 int	start_thinking(t_thread_args *args, int last_to_eat_tracker)
 {
 	int	holded_forks[2];
-	
+
 	holded_forks[0] = 0;
 	holded_forks[1] = 0;
 	mutex_printf("%lld %d is thinking\n", args);
@@ -133,6 +133,7 @@ int	start_thinking(t_thread_args *args, int last_to_eat_tracker)
 			try_left_fork(args, &holded_forks[0]);
 		if (!holded_forks[1])
 			try_right_fork(args, &holded_forks[1]);
+		usleep(500);
 	}
 	return (SUCCESS);
 }
