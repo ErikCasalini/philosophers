@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 15:49:21 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/27 18:04:29 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,24 @@ int	try_right_fork(t_thread_args *args, int *holded_forks)
 
 int	drop_forks(t_thread_args *args)
 {
-	pthread_mutex_lock(&args->mutexes[args->side_forks.left]);
-	args->forks[args->side_forks.left] = 1;
-	pthread_mutex_unlock(&args->mutexes[args->side_forks.left]);
-	pthread_mutex_lock(&args->mutexes[args->side_forks.right]);
-	args->forks[args->side_forks.right] = 1;
-	pthread_mutex_unlock(&args->mutexes[args->side_forks.right]);
-	gettimeofday(&args->started_sleep, NULL);
+	if (args->philo_num % 2 == 1)
+	{
+		pthread_mutex_lock(&args->mutexes[args->side_forks.left]);
+		args->forks[args->side_forks.left] = 1;
+		pthread_mutex_unlock(&args->mutexes[args->side_forks.left]);
+		pthread_mutex_lock(&args->mutexes[args->side_forks.right]);
+		args->forks[args->side_forks.right] = 1;
+		pthread_mutex_unlock(&args->mutexes[args->side_forks.right]);
+	}
+	else
+	{
+		pthread_mutex_lock(&args->mutexes[args->side_forks.right]);
+		args->forks[args->side_forks.right] = 1;
+		pthread_mutex_unlock(&args->mutexes[args->side_forks.right]);
+		pthread_mutex_lock(&args->mutexes[args->side_forks.left]);
+		args->forks[args->side_forks.left] = 1;
+		pthread_mutex_unlock(&args->mutexes[args->side_forks.left]);
+	}
 	return (SUCCESS);
 }
 
@@ -102,26 +113,26 @@ int	is_last_to_eat(t_thread_args *args, int last_to_eat_tracker)
 	return (0);
 }
 
-int	start_thinking(t_thread_args *args, int last_to_eat_tracker)
+int	start_thinking(t_thread_args *args)
 {
 	int	holded_forks[2];
+	int	odd_even_turns;
 
 	holded_forks[0] = 0;
 	holded_forks[1] = 0;
+	odd_even_turns = 1;
 	mutex_printf("%lld %d is thinking\n", args);
-	if (last_to_eat_tracker % 2 == 0)
+	if (odd_even_turns % 2 == 0)
 	{
 		if (args->philo->tt_think != 0
-			&& args->philo_num % 2 == 1
-			|| (is_last_to_eat(args, last_to_eat_tracker) && args->philo->total_philo % 2 == 1))
+			&& args->philo_num % 2 == 1)
 			if (wait_your_turn(args) == ERROR)
 				return (ERROR);
 	}
-	else if (last_to_eat_tracker % 2 == 1)
+	else if (odd_even_turns % 2 == 1)
 	{
 		if (args->philo->tt_think != 0
-			&& args->philo_num % 2 == 0
-			|| (is_last_to_eat(args, last_to_eat_tracker) && args->philo->total_philo % 2 == 1))
+			&& args->philo_num % 2 == 0)
 			if (wait_your_turn(args) == ERROR)
 				return (ERROR);
 	}
@@ -129,10 +140,20 @@ int	start_thinking(t_thread_args *args, int last_to_eat_tracker)
 	{
 		if (!everybody_lives(args))
 			return (ERROR);
-		if (!holded_forks[0])
-			try_left_fork(args, &holded_forks[0]);
-		if (!holded_forks[1])
-			try_right_fork(args, &holded_forks[1]);
+		if (args->philo_num % 2 == 0)
+		{
+			if (!holded_forks[0])
+				try_left_fork(args, &holded_forks[0]);
+			if (!holded_forks[1])
+				try_right_fork(args, &holded_forks[1]);
+		}
+		else
+		{
+			if (!holded_forks[1])
+				try_right_fork(args, &holded_forks[1]);
+			if (!holded_forks[0])
+				try_left_fork(args, &holded_forks[0]);
+		}
 		usleep(500);
 	}
 	return (SUCCESS);
@@ -167,40 +188,42 @@ int	start_sleeping(t_thread_args *args)
 			break ;
 		usleep(500);
 	}
+	// if (args->philo->total_philo % 2 == 0)
+	// 	usleep(5000);
 	return (SUCCESS);
 }
 
 void	*routine(void *args_struct)
 {
-	int				last_to_eat_tracker;
+	// int				last_to_eat_tracker;
 	t_thread_args	*args;
 
 	args = (t_thread_args *)args_struct;
 	pthread_mutex_lock(args->philo->sync_mutex);
 	pthread_mutex_unlock(args->philo->sync_mutex);
-	last_to_eat_tracker = 0;
+	// last_to_eat_tracker = 0;
 	args->started_eat = args->philo->start_time;
-	if (args->philo->tt_think == 0)
-	{
-		if (args->philo_num % 2 == 0 || (is_last_to_eat(args, last_to_eat_tracker) && args->philo->total_philo % 2 == 1))
+	// if (args->philo->tt_think == 0)
+	// {
+		if (args->philo_num % 2 == 0)
 			if (start_sleeping(args) == ERROR)
 				return (NULL);
-		last_to_eat_tracker++;
-	}
+		// last_to_eat_tracker++;
+	// }
 	while (1)
 	{
 		if (args->philo->eat_max != -1
 				&& args->meals_eaten == args->philo->eat_max)
 			return (NULL);
-		if (start_thinking(args, last_to_eat_tracker) == ERROR)
+		if (start_thinking(args) == ERROR)
 			return (NULL);
 		if (start_eating(args) == ERROR)
 			return (NULL);
 		if (start_sleeping(args) == ERROR)
 			return (NULL);
-		last_to_eat_tracker++;
-		if (last_to_eat_tracker == args->philo->total_philo)
-			last_to_eat_tracker = 0;
+		// last_to_eat_tracker++;
+		// if (last_to_eat_tracker == args->philo->total_philo)
+		// 	last_to_eat_tracker = 0;
 	}
 	return (NULL);
 }

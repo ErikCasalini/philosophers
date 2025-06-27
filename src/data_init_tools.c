@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 14:55:34 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/27 17:28:14 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,14 @@ static int	check_and_set_arg(char *arg, int *philo_param)
 	return (SUCCESS);
 }
 
-int	init_tt_think(int tt_eat, int tt_sleep)
+int	init_tt_think(int total_philo, int tt_eat, int tt_sleep)
 {
-	if (tt_eat < tt_sleep)
+	if (total_philo % 2 == 1)
 		return (0);
+	else if (tt_eat <= tt_sleep)
+		return (0);
+	// else if (tt_eat == tt_sleep)
+	// 	return (2);
 	else
 		return (tt_eat - tt_sleep);
 	// return ((tt_eat * 2) - tt_sleep);
@@ -52,7 +56,7 @@ int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *de
 	philo->death_flag = 0;
 	philo->death_mutex = death_mutex;
 	philo->sync_mutex = sync_mutex;
-	philo->tt_think = init_tt_think(philo->tt_eat, philo->tt_sleep);
+	philo->tt_think = init_tt_think(philo->total_philo, philo->tt_eat, philo->tt_sleep);
 	return (SUCCESS);
 }
 
