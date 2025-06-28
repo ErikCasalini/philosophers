@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi_flag.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 10:00:22 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 11:53:54 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 13:33:58 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static int	ft_isspace(char c)
 	return (0);
 }
 
-static int	is_sign(char c, int *sign, t_intf *n)
+static int	is_sign(char c, t_intf *n)
 {
 	if (c == '+')
 		return (1);
@@ -58,16 +58,14 @@ static int	is_overflow(t_intf *n, char digit)
 
 t_intf	ft_atoi_flag(char *str)
 {
-	int		sign;
 	int		i;
 	t_intf	n;
 
 	i = 0;
 	n = (t_intf){0, invalid};
-	sign = 1;
 	while (ft_isspace(str[i]))
 		i++;
-	if (is_sign(str[i], &sign, &n))
+	if (is_sign(str[i], &n))
 		i++;
 	if (n.flag == negative)
 		return (n);

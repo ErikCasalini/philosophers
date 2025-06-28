@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+         #
+#    By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/28 12:28:37 by ecasalin          #+#    #+#              #
-#    Updated: 2025/06/28 12:35:26 by ecasalin         ###   ########.fr        #
+#    Updated: 2025/06/28 13:56:51 by ecasalin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,9 +19,9 @@ CC = cc
 
 FLAGS = -Wall -Wextra -Werror
 
-OBJS_DIR = ./OBJECTS
+OBJS_DIR = ./bin
 
-OBJS_BONUS_DIR = ./OBJECTS_BONUS
+# OBJS_BONUS_DIR = ./OBJECTS_BONUS
 
 DEPS =	philosophers.h \
 		Makefile
@@ -29,9 +29,9 @@ DEPS =	philosophers.h \
 # DEPS_BONUS = $(DEPS) \
 # 			push_swap_bonus.h
 
-vpath %.c src SOURCES_BONUS
-vpath %.o OBJECTS
-vpath %.h INCLUDES
+vpath %.c src
+vpath %.o bin
+vpath %.h src
 
 SRCS =	main.c \
 		allocate_heap.c \
@@ -59,14 +59,14 @@ SRCS =	main.c \
 
 OBJS = $(addprefix $(OBJS_DIR)/, $(SRCS:.c=.o))
 
-OBJS_BONUS = $(addprefix $(OBJS_BONUS_DIR)/, $(SRCS_BONUS:.c=.o))
+# OBJS_BONUS = $(addprefix $(OBJS_BONUS_DIR)/, $(SRCS_BONUS:.c=.o))
 
 all: makedir $(NAME)
 
 # bonus: makedir_bonus $(BONUS)
 
-$(NAME): $(OBJS) $(LIBFT_DIR)/libft.a
-	$(CC) $(FLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(OBJS)
+	$(CC) $(OBJS) -o $(NAME)
 
 # $(BONUS): $(OBJS_BONUS) $(LIBFT_DIR)/libft.a
 # 	$(CC) $(FLAGS) -L$(LIBFT_DIR)/ $(OBJS_BONUS) $(LIBS) -o $(BONUS)
