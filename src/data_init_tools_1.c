@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   data_init_tools.c                                  :+:      :+:    :+:   */
+/*   data_init_tools_1.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/27 17:28:14 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 09:31:44 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,13 @@ static int	check_and_set_arg(char *arg, int *philo_param)
 
 int	init_tt_think(int total_philo, int tt_eat, int tt_sleep)
 {
-	if (total_philo % 2 == 1)
+	 if (tt_eat <= tt_sleep)
 		return (0);
-	else if (tt_eat <= tt_sleep)
-		return (0);
-	// else if (tt_eat == tt_sleep)
-	// 	return (2);
 	else
 		return (tt_eat - tt_sleep);
-	// return ((tt_eat * 2) - tt_sleep);
 }
 
-int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *death_mutex, pthread_mutex_t *sync_mutex)
+int	init_philo_struct(int argc, char **argv, t_philo *philo)
 {
 	if (check_and_set_arg(argv[2], &philo->tt_die) == ERROR)
 		return (ERROR);
@@ -54,28 +49,27 @@ int	init_philo_struct(int argc, char **argv, t_philo *philo, pthread_mutex_t *de
 	else
 		philo->eat_max = -1;
 	philo->death_flag = 0;
-	philo->death_mutex = death_mutex;
-	philo->sync_mutex = sync_mutex;
 	philo->tt_think = init_tt_think(philo->total_philo, philo->tt_eat, philo->tt_sleep);
 	return (SUCCESS);
 }
 
-int init_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex, pthread_mutex_t *sync_mutex)
+int init_mutexes(t_mutexes *mutexes, pthread_mutex_t *fork_mutexes, int total_philo)
 {
 	int	i;
 
 	i = 0;
 	while (i < total_philo)
 	{
-		pthread_mutex_init(&mutexes[i], NULL);
+		pthread_mutex_init(&fork_mutexes[i], NULL);
 		i++;
 	}
-	pthread_mutex_init(death_mutex, NULL);
-	pthread_mutex_init(sync_mutex, NULL);
+	pthread_mutex_init(&mutexes->death_mutex, NULL);
+	pthread_mutex_init(&mutexes->sync_mutex, NULL);
+	mutexes->fork_mutexes = fork_mutexes;
 	return (SUCCESS);
 }
 
-t_side_forks set_forks(int current_philo, int philo_num)
+t_side_forks init_forks_indexes(int current_philo, int philo_num)
 {
 	t_side_forks	side_forks;
 

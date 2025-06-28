@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:35:35 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 13:40:31 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 09:20:30 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,21 +31,17 @@ long long	curr_timestamp(struct timeval start_time)
 	return (get_ms_diff(start_time, current_time));
 }
 
-void	ft_usleep(int ms)
-{
-	long long temp;
-	struct timeval start;
-	
-	gettimeofday(&start, NULL);
-	temp = curr_timestamp(start);
-	while ((curr_timestamp(start) - temp) < ms)
-		usleep(100);
-}
-
 void	mutex_printf(char *str, t_thread_args *args)
 {
-	pthread_mutex_lock(args->philo->death_mutex);
+	pthread_mutex_lock(&args->mutexes->death_mutex);
 	if (!args->philo->death_flag)
 		printf(str, curr_timestamp(args->philo->start_time), args->philo_num);
-	pthread_mutex_unlock(args->philo->death_mutex);
+	pthread_mutex_unlock(&args->mutexes->death_mutex);
 }
+
+int	is_even(int philo_num)
+{
+	if (philo_num % 2 == 0)
+		return (1);
+	return (0);
+} 

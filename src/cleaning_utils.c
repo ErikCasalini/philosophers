@@ -3,28 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   cleaning_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 07:32:03 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/25 17:17:09 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 09:47:36 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 #include <pthread.h>
 
-int	destroy_mutexes(pthread_mutex_t *mutexes, int total_philo, pthread_mutex_t *death_mutex, pthread_mutex_t *sync_mutex)
+int	destroy_mutexes(t_mutexes *mutexes, int total_philo)
 {
 	int	i;
 
 	i = 0;
 	while (i < total_philo)
 	{
-		pthread_mutex_destroy(&mutexes[i]);
+		pthread_mutex_destroy(&mutexes->fork_mutexes[i]);
 		i++;
 	}
-	pthread_mutex_destroy(death_mutex);
-	pthread_mutex_destroy(sync_mutex);
+	pthread_mutex_destroy(&mutexes->death_mutex);
+	pthread_mutex_destroy(&mutexes->sync_mutex);
 	return (SUCCESS);
 }
 
