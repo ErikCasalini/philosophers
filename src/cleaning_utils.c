@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 07:32:03 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 09:47:36 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 10:28:46 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,12 @@ int	destroy_mutexes(t_mutexes *mutexes, int total_philo)
 	return (SUCCESS);
 }
 
-int	join_threads(pthread_t *thread_lst, int total_philo)
+int	join_threads(pthread_t *thread_lst, int threads_to_join)
 {
 	int	i;
 
 	i = 0;
-	while (i < total_philo)
+	while (i < threads_to_join)
 	{
 		pthread_join(thread_lst[i], NULL);
 		i++;

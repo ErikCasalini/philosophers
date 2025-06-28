@@ -6,16 +6,17 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 08:05:41 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 09:14:41 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 11:34:41 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void	init_thread_args_struct(t_heap_allocated *heap, t_philo *philo, int philo_num, int total_philo)
+void	init_thread_args_struct(t_heap_allocated *heap,
+			t_philo *philo, int philo_num, int total_philo)
 {
 	t_side_forks	side_forks;
-	
+
 	side_forks = init_forks_indexes(philo_num, total_philo);
 	heap->thread_args[philo_num].philo = philo;
 	heap->thread_args[philo_num].philo_num = philo_num + 1;

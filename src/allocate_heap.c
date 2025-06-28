@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:28:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 09:16:17 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 11:47:05 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ int	allocate_heap(t_heap_allocated *heap, int total_philo)
 	return (SUCCESS);
 }
 
-char *alloc_forks_array(int fork_num)
+char	*alloc_forks_array(int fork_num)
 {
-	char *forks;
+	char	*forks;
 
 	forks = malloc(fork_num);
 	if (forks == NULL)
@@ -45,7 +45,7 @@ char *alloc_forks_array(int fork_num)
 pthread_mutex_t	*alloc_fork_mutexes(int mutexes_num)
 {
 	pthread_mutex_t	*fork_mutexes;
-	
+
 	fork_mutexes = malloc(sizeof(pthread_mutex_t) * mutexes_num);
 	if (fork_mutexes == NULL)
 		return (NULL);
@@ -53,7 +53,7 @@ pthread_mutex_t	*alloc_fork_mutexes(int mutexes_num)
 	return (fork_mutexes);
 }
 
-pthread_t *alloc_thread_lst(int thread_num)
+pthread_t	*alloc_thread_lst(int thread_num)
 {
 	pthread_t	*thread_lst;
 
@@ -64,7 +64,7 @@ pthread_t *alloc_thread_lst(int thread_num)
 	return (thread_lst);
 }
 
-t_thread_args *alloc_thread_args(int thread_num)
+t_thread_args	*alloc_thread_args(int thread_num)
 {
 	t_thread_args	*thread_args;
 

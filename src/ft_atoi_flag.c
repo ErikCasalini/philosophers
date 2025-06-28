@@ -6,19 +6,11 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 10:00:22 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/26 10:21:17 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/28 11:53:54 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-int	ft_isdigit(int c)
-{
-	if (c >= '0' && c <= '9')
-		return (1);
-	else
-		return (0);
-}
 
 static int	ft_isspace(char c)
 {
