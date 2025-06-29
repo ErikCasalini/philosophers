@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 11:54:20 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/29 17:00:34 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ typedef struct s_philo
 	int				tt_die;
 	int				tt_eat;
 	int				tt_sleep;
-	int				tt_think;
 	int				eat_max;
 	int				total_philo;
 	char			death_flag;
@@ -120,6 +119,8 @@ t_intf			ft_atoi_flag(char *str);
 void			mutex_printf(char *str, t_thread_args *args);
 int				is_even(int philo_num);
 int				ft_isdigit(int c);
+int				ft_putstr_fd(char *s, int fd);
+int				ft_strlen(const char *s);
 
 /* FREE UTILS */
 void			free_heap(t_heap_allocated *heap);

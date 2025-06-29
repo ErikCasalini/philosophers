@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:36:35 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 09:17:05 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/29 17:05:37 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,6 @@ void	free_heap(t_heap_allocated *heap)
 int	free_heap_exit_err(t_heap_allocated *heap)
 {
 	free_heap(heap);
-	printf("Internal error occurred\n");
+	ft_putstr_fd("Memory allocation error\n", 2);
 	exit(1);
 }

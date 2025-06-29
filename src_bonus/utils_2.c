@@ -1,26 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   args_errors_utils.c                                :+:      :+:    :+:   */
+/*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/24 08:45:41 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/29 17:01:59 by ecasalin         ###   ########.fr       */
+/*   Created: 2025/06/29 16:56:57 by ecasalin          #+#    #+#             */
+/*   Updated: 2025/06/29 17:02:25 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include "philosophers.h"
+#include <unistd.h>
 
-void	exit_bad_argument(void)
+int	ft_strlen(const char *s)
 {
-	ft_putstr_fd("Bad arguments: provide positive or "
-		"null integers in the following order:\n"
-		"number_of_philosophers\n"
-		"time_to_die\n"
-		"time_to_eat\n"
-		"time_to_sleep\n"
-		"Optional: number_of_times_each_philosopher_must_eat\n", 2);
-	exit (2);
+	int	i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
+}
+
+int	ft_isdigit(int c)
+{
+	if (c >= '0' && c <= '9')
+		return (1);
+	else
+		return (0);
+}
+
+int	ft_putstr_fd(char *s, int fd)
+{
+	return (write(fd, s, ft_strlen(s)));
 }

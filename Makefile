@@ -6,7 +6,7 @@
 #    By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/28 12:28:37 by ecasalin          #+#    #+#              #
-#    Updated: 2025/06/28 13:56:51 by ecasalin         ###   ########.fr        #
+#    Updated: 2025/06/29 16:58:10 by ecasalin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,7 +43,8 @@ SRCS =	main.c \
 		free_utils.c \
 		ft_atoi_flag.c \
 		routine.c \
-		utils.c
+		utils_1.c \
+		utils_2.c
 
 # SRCS_BONUS =	checker_bonus.c \
 # 				utils_bonus.c \

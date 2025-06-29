@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 11:48:51 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/29 17:04:03 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static int	print_error_set_flag(char *err_msg,
 {
 	pthread_mutex_lock(death_mutex);
 	philo->death_flag = 1;
-	printf("%s\n", err_msg);
+	ft_putstr_fd(err_msg, 2);
 	pthread_mutex_unlock(death_mutex);
 	philo->return_value = ERROR;
 	return (return_value);
@@ -35,7 +35,7 @@ int	create_threads(t_philo *philo,
 	int				philo_num;
 
 	if (gettimeofday(&philo->start_time, NULL) != SUCCESS)
-		return (print_error_set_flag("Warning: unable to get time of day",
+		return (print_error_set_flag("Warning: unable to get time of day\n",
 				0, philo, &mutexes->death_mutex));
 	philo_num = 0;
 	pthread_mutex_lock(&mutexes->sync_mutex);
@@ -48,7 +48,7 @@ int	create_threads(t_philo *philo,
 				routine,
 				&heap->thread_args[philo_num]) > SUCCESS)
 		{
-			print_error_set_flag("Thread creation error",
+			print_error_set_flag("Thread creation error\n",
 				0, philo, &mutexes->death_mutex);
 			break ;
 		}
