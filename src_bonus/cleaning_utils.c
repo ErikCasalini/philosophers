@@ -1,32 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   args_errors_utils.c                                :+:      :+:    :+:   */
+/*   cleaning_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/24 08:45:41 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 14:40:07 by ecasalin         ###   ########.fr       */
+/*   Created: 2025/06/30 13:36:05 by ecasalin          #+#    #+#             */
+/*   Updated: 2025/06/30 13:36:57 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include <semaphore.h>
 #include "philosophers_bonus.h"
 
-void	exit_bad_argument(void)
+void	unlink_close_sem(sem_t *semaphores)
 {
-	ft_putstr_fd("Bad arguments: provide positive or "
-		"null integers in the following order:\n"
-		"number_of_philosophers\n"
-		"time_to_die\n"
-		"time_to_eat\n"
-		"time_to_sleep\n"
-		"Optional: number_of_times_each_philosopher_must_eat\n", 2);
-	exit (2);
+	sem_unlink(semaphores);
+	sem_close(semaphores);
 }
 
-int	print_err_return_err(char *err_msg)
+void	close_semaphores(t_sem *semaphores)
 {
-	ft_putstr_fd(err_msg, 2);
-	return (ERROR);
+	unlink_close_sem(&semaphores->forks);
+	unlink_close_sem(&semaphores->death);
+	unlink_close_sem(&semaphores->sync);
 }

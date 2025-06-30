@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:56:57 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/29 17:02:25 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/30 15:38:37 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,4 +33,11 @@ int	ft_isdigit(int c)
 int	ft_putstr_fd(char *s, int fd)
 {
 	return (write(fd, s, ft_strlen(s)));
+}
+
+int	is_even(int philo_num)
+{
+	if (philo_num % 2 == 0)
+		return (1);
+	return (0);
 }

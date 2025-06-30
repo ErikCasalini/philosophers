@@ -6,11 +6,11 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 10:00:22 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 13:33:58 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/30 07:41:44 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "philosophers_bonus.h"
 
 static int	ft_isspace(char c)
 {
