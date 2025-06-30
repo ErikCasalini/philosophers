@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:55 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 15:44:01 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:25:26 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ typedef struct s_threads_args
 
 /* INIT UTILS */
 int		init_philo_struct(int argc, char **argv, t_philo *philo);
+int		init_semaphores(t_sem *semaphores, int total_philo);
 
 /* UTILS */
 t_intf		ft_atoi_flag(char *str);
@@ -83,7 +84,7 @@ int			is_death_flag(t_philo *philo, t_sem *semaphores);
 int			is_even(int philo_num);
 
 /* CLEANING UTILS */
-void	unlink_close_sem(sem_t *semaphores);
+void	unlink_close_sem(char *sem_name, sem_t *semaphores);
 void	close_semaphores(t_sem *semaphores);
 
 /* PRINT ERRORS UTILS */

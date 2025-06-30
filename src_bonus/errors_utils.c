@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   args_errors_utils.c                                :+:      :+:    :+:   */
+/*   errors_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:45:41 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 11:49:19 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:11:39 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,4 +23,10 @@ void	exit_bad_argument(void)
 		"time_to_sleep\n"
 		"Optional: number_of_times_each_philosopher_must_eat\n", 2);
 	exit (2);
+}
+
+int	print_err_return_err(char *err_msg)
+{
+	ft_putstr_fd(err_msg, 2);
+	return (ERROR);
 }

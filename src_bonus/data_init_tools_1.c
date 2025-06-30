@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 15:37:28 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:21:58 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,15 @@ static int	check_and_set_arg(char *arg, int *philo_param)
 int	close_sem_error(t_sem *semaphores)
 {
 	if (semaphores->forks != SEM_FAILED)
-		unlink_close_sem(&semaphores->forks);
+		unlink_close_sem("forks", semaphores->forks);
 	if (semaphores->death != SEM_FAILED)
-		unlink_close_sem(&semaphores->death);
+		unlink_close_sem("death", semaphores->death);
 	if (semaphores->sync != SEM_FAILED)
-		unlink_close_sem(&semaphores->sync);
+		unlink_close_sem("sync", semaphores->sync);
 	if (semaphores->var != SEM_FAILED)
-		unlink_close_sem(&semaphores->var);
+		unlink_close_sem("var", semaphores->var);
 	if (semaphores->print != SEM_FAILED)
-		unlink_close_sem(&semaphores->print);
+		unlink_close_sem("print", semaphores->print);
 	return (ERROR);
 }
 
@@ -63,7 +63,7 @@ int	init_semaphores(t_sem *semaphores, int total_philo)
 	semaphores->var = sem_open("var", O_CREAT, 0644, 1);
 	if (semaphores->var == SEM_FAILED)
 		return (close_sem_error(semaphores));
-	semaphores->print = sem_open("print", O_CREAT, 0644, 0);
+	semaphores->print = sem_open("print", O_CREAT, 0644, 1);
 	if (semaphores->print == SEM_FAILED)
 		return (close_sem_error(semaphores));
 	return (SUCCESS);
@@ -86,7 +86,8 @@ int	init_philo_struct(int argc, char **argv, t_philo *philo)
 	}
 	else
 		philo->eat_max = -1;
-	philo->meal_eaten = 0;
+	philo->philo_num = 0;
+	philo->meals_eaten = 0;
 	philo->start_time = (struct timeval){0, 0};
 	philo->started_eat = (struct timeval){0, 0};
 	philo->started_sleep = (struct timeval){0, 0};
