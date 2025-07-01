@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 14:15:53 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 17:10:41 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 11:34:14 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,13 @@ int	is_death_flag(t_philo *philo, t_sem *semaphores)
 
 int	semlock_printf(char *str, t_philo *philo, t_sem *semaphores)
 {
+	sem_wait(semaphores->death_print);
 	if (is_death_flag(philo, semaphores))
+	{
+		sem_post(semaphores->death_print);
 		return (SUCCESS);
+	}
+	sem_post(semaphores->death_print);
 	sem_wait(semaphores->print);
 	if (printf(str, curr_timestamp(philo->start_time), philo->philo_num) < 0)
 		{

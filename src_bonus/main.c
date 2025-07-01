@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 12:34:06 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 12:57:48 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,19 +45,23 @@ void *death_tracker_routine(void *arg_lst)
 	while (1)
 	{
 		gettimeofday(&current_time, NULL);
-		sem_wait(args->semaphores->var);
+		// sem_wait(args->semaphores->print);
 		ms_diff = get_ms_diff(args->philo->started_eat, current_time);
 		if (ms_diff >= args->philo->tt_die)
 		{
-			// sem_wait(args->semaphores->var);
-			if (!args->philo->death_flag) // Si jamais printef a precedamment echoué le flag est deja la, et on ne doit pas ecrire
-				semlock_printf("%lld %d died\n", args->philo, args->semaphores);
-			sem_post(args->semaphores->var);
+			sem_wait(args->semaphores->death_print);
+			// sem_wait(args->semaphores->print);
+			if (!is_death_flag(args->philo, args->semaphores))
+				printf("%lld %d died\n", curr_timestamp(args->philo->start_time), args->philo->philo_num);
 			sem_post(args->semaphores->death);
-			usleep(3000);
+			usleep(500);
+			// semlock_printf("%lld %d died\n", args->philo, args->semaphores);
+			// sem_post(args->semaphores->print);
+			sem_post(args->semaphores->death_print);
+			// sem_post(args->semaphores->var);
 			return (NULL);
 		}
-		sem_post(args->semaphores->var);
+		// sem_post(args->semaphores->print);
 		usleep(250);
 	}
 	return (NULL);
@@ -90,7 +94,7 @@ int create_threads(t_threads_args *args, pthread_t *death_tracker, pthread_t *de
 	else
 	{
 		sem_post(args->semaphores->death);
-		usleep(3000);
+		// usleep(3000);
 		return(print_err_return_err("Thread creation error\n)"));
 	}
 	return (SUCCESS);
@@ -98,6 +102,7 @@ int create_threads(t_threads_args *args, pthread_t *death_tracker, pthread_t *de
 
 void subprocess_close_sem_exit(t_sem *semaphores)
 {
+	usleep(10000);
 	sem_close(semaphores->death);
 	sem_close(semaphores->forks);
 	// sem_close(semaphores->sync);
@@ -106,14 +111,22 @@ void subprocess_close_sem_exit(t_sem *semaphores)
 	exit(0);
 }
 
-void	start_thinking(t_philo *philo, t_sem *semaphores)
+int	start_thinking(t_philo *philo, t_sem *semaphores)
 {
 	usleep(500);
+	if (is_death_flag(philo, semaphores))
+		return (ERROR);
 	semlock_printf("%lld %d is thinking\n", philo, semaphores);
 	sem_wait(semaphores->forks);
 	semlock_printf("%lld %d has taken a fork\n", philo, semaphores);
+	if (is_death_flag(philo, semaphores))
+	{
+		sem_post(semaphores->forks);
+		return (ERROR);
+	}
 	sem_wait(semaphores->forks);
 	semlock_printf("%lld %d has taken a fork\n", philo, semaphores);
+	return (SUCCESS);
 }
 
 int	start_eating(t_philo *philo, t_sem *semaphores)
@@ -163,6 +176,10 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 
 	args.philo = philo;
 	args.semaphores = semaphores;
+	gettimeofday(&philo->start_time, NULL); //maybe data race
+	philo->started_eat = philo->start_time;
+	if (create_threads(&args, &death_tracker, &death_flag_setter) == ERROR)
+		subprocess_close_sem_exit(semaphores);
 	sem_wait(semaphores->sync);
 	sem_close(semaphores->sync);
 	gettimeofday(&philo->start_time, NULL);
@@ -177,7 +194,8 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 		if (philo->eat_max != -1
 			&& philo->meals_eaten == philo->eat_max)
 			subprocess_close_sem_exit(semaphores);
-		start_thinking(philo, semaphores);
+		if (start_thinking(philo, semaphores) == ERROR)
+			subprocess_close_sem_exit(semaphores);
 		if (start_eating(philo, semaphores) == ERROR)
 			subprocess_close_sem_exit(semaphores);
 		if (start_sleeping(philo, semaphores) == ERROR)

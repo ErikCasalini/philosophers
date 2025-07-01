@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:55 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 17:25:26 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 11:29:21 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ typedef struct s_sem
 	sem_t	*sync;
 	sem_t	*var;
 	sem_t	*print;
+	sem_t	*death_print;
 }				t_sem;
 
 /* THREADS_ARGS */
