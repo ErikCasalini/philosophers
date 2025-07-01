@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 18:00:37 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 08:23:55 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ void subprocess_close_sem_exit(t_sem *semaphores)
 
 void	start_thinking(t_philo *philo, t_sem *semaphores)
 {
+	usleep(500);
 	semlock_printf("%lld %d is thinking\n", philo, semaphores);
 	sem_wait(semaphores->forks);
 	semlock_printf("%lld %d has taken a fork\n", philo, semaphores);
@@ -165,7 +166,7 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 	if (create_threads(&args, &death_tracker, &death_flag_setter) == ERROR)
 		subprocess_close_sem_exit(semaphores);
 	sem_wait(semaphores->sync);
-	sem_post(semaphores->sync);
+	// sem_post(semaphores->sync);
 	sem_close(semaphores->sync);
 	gettimeofday(&philo->start_time, NULL);
 	if (is_even(philo->philo_num))
@@ -183,6 +184,15 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 			subprocess_close_sem_exit(semaphores);
 	}
 	subprocess_close_sem_exit(semaphores);
+}
+
+void	post_sem_sync(sem_t *sem_sync, int total_philo)
+{
+	while (total_philo)
+	{
+		sem_post(sem_sync);
+		total_philo--;
+	}
 }
 
 int	main(int argc, char *argv[])
@@ -210,7 +220,7 @@ int	main(int argc, char *argv[])
 	}
 	if (child_pid == CHILD)
 		philo_routine_and_exit(&philo, &semaphores);
-	sem_post(semaphores.sync);
+	post_sem_sync(semaphores.sync, philo.total_philo);
 	wait_children(philo.philo_num);
 	close_semaphores(&semaphores);
 }
