@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 12:57:48 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 19:06:59 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,15 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include "philosophers_bonus.h"
+
+void	post_sem_sync(sem_t *sem_sync, int total_philo)
+{
+	while (total_philo)
+	{
+		sem_post(sem_sync);
+		total_philo--;
+	}
+}
 
 void	exit_print_error(char *err_msg, int exit_value)
 {
@@ -76,22 +85,18 @@ void *death_flag_setter_routine(void *arg_lst)
 	sem_wait(args->semaphores->var);
 	args->philo->death_flag = 1;
 	sem_post(args->semaphores->var);
-	sem_post(args->semaphores->death);
+	post_sem_sync(args->semaphores->death, args->philo->total_philo);
 	return (NULL);
 }
 
 int create_threads(t_threads_args *args, pthread_t *death_tracker, pthread_t *death_flag_setter)
 {
-	if (pthread_create(death_tracker, NULL, death_tracker_routine, args) == SUCCESS)
-		pthread_detach(*death_tracker);
-	else
+	if (pthread_create(death_tracker, NULL, death_tracker_routine, args) == ERROR)
 	{
 		sem_post(args->semaphores->death);
 		return(print_err_return_err("Thread creation error\n)"));
 	}
-	if (pthread_create(death_flag_setter, NULL, death_flag_setter_routine, args) == SUCCESS)
-		pthread_detach(*death_flag_setter);
-	else
+	if (pthread_create(death_flag_setter, NULL, death_flag_setter_routine, args) == ERROR)
 	{
 		sem_post(args->semaphores->death);
 		// usleep(3000);
@@ -100,12 +105,12 @@ int create_threads(t_threads_args *args, pthread_t *death_tracker, pthread_t *de
 	return (SUCCESS);
 }
 
-void subprocess_close_sem_exit(t_sem *semaphores)
+void subprocess_close_sem_exit(t_sem *semaphores, pthread_t thread_1, pthread_t thread_2)
 {
-	usleep(10000);
+	pthread_join(thread_1, NULL);
+	pthread_join(thread_2, NULL);
 	sem_close(semaphores->death);
 	sem_close(semaphores->forks);
-	// sem_close(semaphores->sync);
 	sem_close(semaphores->var);
 	sem_close(semaphores->print);
 	exit(0);
@@ -179,38 +184,29 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 	gettimeofday(&philo->start_time, NULL); //maybe data race
 	philo->started_eat = philo->start_time;
 	if (create_threads(&args, &death_tracker, &death_flag_setter) == ERROR)
-		subprocess_close_sem_exit(semaphores);
+		subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter); // danger
 	sem_wait(semaphores->sync);
 	sem_close(semaphores->sync);
 	gettimeofday(&philo->start_time, NULL);
 	philo->started_eat = philo->start_time;
 	if (create_threads(&args, &death_tracker, &death_flag_setter) == ERROR)
-		subprocess_close_sem_exit(semaphores);
+		subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 	if (is_even(philo->philo_num))
 		if (start_sleeping(philo, semaphores) == ERROR)
-			subprocess_close_sem_exit(semaphores);
+			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 	while (1)
 	{
 		if (philo->eat_max != -1
 			&& philo->meals_eaten == philo->eat_max)
-			subprocess_close_sem_exit(semaphores);
+			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 		if (start_thinking(philo, semaphores) == ERROR)
-			subprocess_close_sem_exit(semaphores);
+			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 		if (start_eating(philo, semaphores) == ERROR)
-			subprocess_close_sem_exit(semaphores);
+			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 		if (start_sleeping(philo, semaphores) == ERROR)
-			subprocess_close_sem_exit(semaphores);
+			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 	}
-	subprocess_close_sem_exit(semaphores);
-}
-
-void	post_sem_sync(sem_t *sem_sync, int total_philo)
-{
-	while (total_philo)
-	{
-		sem_post(sem_sync);
-		total_philo--;
-	}
+	subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 }
 
 int	main(int argc, char *argv[])
