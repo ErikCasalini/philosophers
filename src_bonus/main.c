@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 15:25:30 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 15:46:17 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,18 @@ void *death_tracker_routine(void *arg_lst)
 		{
 			// sem_wait(args->semaphores->var);
 			// if (!args->philo->death_flag) // Si jamais printef a precedamment echoué le flag est deja la, et on ne doit pas ecrire
-			semlock_printf("%lld %d died\n", args->philo, args->semaphores);
+			// semlock_printf("%lld %d died\n", args->philo, args->semaphores);
 			// sem_post(args->semaphores->var);
 			sem_post(args->semaphores->death);
+			if (is_death_flag(args->philo, args->semaphores))
+				return ((void*)SUCCESS);
 			usleep(3000);
-			return (NULL);
+			return ((void *)ERROR);
 		}
 		// sem_post(args->semaphores->var);
 		usleep(250);
 	}
-	return (NULL);
+	return ((void *)SUCCESS);
 }
 
 void *death_flag_setter_routine(void *arg_lst)
@@ -94,13 +96,17 @@ int create_threads(t_threads_args *args, pthread_t *death_tracker, pthread_t *de
 
 void subprocess_close_sem_exit(t_sem *semaphores, pthread_t thread_1, pthread_t thread_2)
 {
-	pthread_join(thread_1, NULL);
+	void *return_value;
+	
+	pthread_join(thread_1, &return_value);
 	pthread_join(thread_2, NULL);
 	sem_close(semaphores->death);
 	sem_close(semaphores->forks);
 	sem_close(semaphores->var);
 	sem_close(semaphores->print);
 	sem_close(semaphores->time);
+	if ((long)return_value == ERROR)
+		printf("DIED\n");
 	exit(0);
 }
 
