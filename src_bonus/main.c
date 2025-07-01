@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 15:46:17 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 17:39:32 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void *death_tracker_routine(void *arg_lst)
 	args = (t_threads_args *)arg_lst;
 	while (1)
 	{
-		gettimeofday(&current_time, NULL);
+		semlock_gettimeofday(&current_time, args->semaphores->time);
 		// sem_wait(args->semaphores->var);
 		ms_diff = get_ms_diff(args->philo->started_eat, current_time);
 		if (ms_diff >= args->philo->tt_die)
@@ -97,7 +97,7 @@ int create_threads(t_threads_args *args, pthread_t *death_tracker, pthread_t *de
 void subprocess_close_sem_exit(t_sem *semaphores, pthread_t thread_1, pthread_t thread_2)
 {
 	void *return_value;
-	
+
 	pthread_join(thread_1, &return_value);
 	pthread_join(thread_2, NULL);
 	sem_close(semaphores->death);
@@ -131,7 +131,7 @@ int	start_thinking(t_philo *philo, t_sem *semaphores)
 int	start_eating(t_philo *philo, t_sem *semaphores)
 {
 	sem_wait(semaphores->var);
-	gettimeofday(&philo->started_eat, NULL);
+	semlock_gettimeofday(&philo->started_eat, semaphores->time);
 	sem_post(semaphores->var);
 	semlock_printf("%lld %d is eating\n", philo, semaphores);
 	while (1)
@@ -142,7 +142,7 @@ int	start_eating(t_philo *philo, t_sem *semaphores)
 			sem_post(semaphores->forks);
 			return (ERROR);
 		}
-		if (curr_timestamp(philo->started_eat) >= philo->tt_eat)
+		if (curr_timestamp(philo->started_eat, semaphores->time) >= philo->tt_eat)
 			break ;
 		usleep(250);
 	}
@@ -154,13 +154,13 @@ int	start_eating(t_philo *philo, t_sem *semaphores)
 
 int	start_sleeping(t_philo *philo, t_sem *semaphores)
 {
-	gettimeofday(&philo->started_sleep, NULL);
+	semlock_gettimeofday(&philo->started_sleep, semaphores->time);
 	semlock_printf("%lld %d is sleeping\n", philo, semaphores);
 	while (1)
 	{
 		if (is_death_flag(philo, semaphores))
 			return (ERROR);
-		if (curr_timestamp(philo->started_sleep) >= philo->tt_sleep)
+		if (curr_timestamp(philo->started_sleep, semaphores->time) >= philo->tt_sleep)
 			break ;
 		usleep(250);
 	}
@@ -177,7 +177,6 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 	args.semaphores = semaphores;
 	sem_wait(semaphores->sync);
 	sem_close(semaphores->sync);
-	gettimeofday(&philo->start_time, NULL);
 	philo->started_eat = philo->start_time;
 	if (create_threads(&args, &death_tracker, &death_flag_setter) == ERROR)
 		subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter); // A FIX (PAS DE PTHREAD JOIN ICI)
@@ -221,6 +220,7 @@ int	main(int argc, char *argv[])
 	if (init_semaphores(&semaphores, philo.total_philo) == ERROR)
 		exit_print_error("Semaphores creation error\n", 2);
 	child_pid = 1;
+	gettimeofday(&philo.start_time, NULL);
 	while (child_pid != CHILD && ++philo.philo_num <= philo.total_philo)
 	{
 		child_pid = fork();

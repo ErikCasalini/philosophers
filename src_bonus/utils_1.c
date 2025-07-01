@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 14:15:53 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 13:14:55 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 17:30:25 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ long long	get_ms_diff(struct timeval start, struct timeval current)
 	return (diff);
 }
 
-long long	curr_timestamp(struct timeval start_time)
+long long	curr_timestamp(struct timeval start_time, sem_t *time)
 {
 	struct timeval	current_time;
-	
-	gettimeofday(&current_time, NULL);
+
+	semlock_gettimeofday(&current_time, time);
 	return (get_ms_diff(start_time, current_time));
 }
 
@@ -49,7 +49,7 @@ int	semlock_printf(char *str, t_philo *philo, t_sem *semaphores)
 	if (is_death_flag(philo, semaphores))
 		return (SUCCESS);
 	sem_wait(semaphores->print);
-	if (printf(str, curr_timestamp(philo->start_time), philo->philo_num) < 0)
+	if (printf(str, curr_timestamp(philo->start_time, semaphores->time), philo->philo_num) < 0)
 		{
 			sem_wait(semaphores->var);
 			philo->death_flag = 1;
@@ -58,4 +58,11 @@ int	semlock_printf(char *str, t_philo *philo, t_sem *semaphores)
 		}
 	sem_post(semaphores->print);
 	return (SUCCESS);
+}
+
+void	semlock_gettimeofday(struct timeval *time_buffer, sem_t *time)
+{
+	sem_wait(time);
+	gettimeofday(time_buffer, NULL);
+	sem_post(time);
 }

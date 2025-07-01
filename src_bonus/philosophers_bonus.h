@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:55 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 13:12:12 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 17:33:20 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,9 @@ t_intf		ft_atoi_flag(char *str);
 int			ft_isdigit(int c);
 int			ft_putstr_fd(char *s, int fd);
 long long	get_ms_diff(struct timeval start, struct timeval current);
-long long	curr_timestamp(struct timeval start_time);
+long long	curr_timestamp(struct timeval start_time, sem_t *time);
 int			semlock_printf(char *str, t_philo *philo, t_sem *semaphores);
+void		semlock_gettimeofday(struct timeval *time_buffer, sem_t *time);
 int			is_death_flag(t_philo *philo, t_sem *semaphores);
 int			is_even(int philo_num);
 
