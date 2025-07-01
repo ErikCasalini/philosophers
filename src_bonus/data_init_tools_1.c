@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:47:58 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 12:37:46 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 14:25:38 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,18 +39,21 @@ int	close_sem_error(t_sem *semaphores)
 		unlink_close_sem("var", semaphores->var);
 	if (semaphores->print != SEM_FAILED)
 		unlink_close_sem("print", semaphores->print);
+	if (semaphores->time != SEM_FAILED)
+		unlink_close_sem("print", semaphores->time);
 	return (ERROR);
 }
 
 int	init_semaphores(t_sem *semaphores, int total_philo)
 {
 	*semaphores = (t_sem){SEM_FAILED,
-			SEM_FAILED, SEM_FAILED, SEM_FAILED, SEM_FAILED};
+			SEM_FAILED, SEM_FAILED, SEM_FAILED, SEM_FAILED, SEM_FAILED};
 	sem_unlink("forks");
 	sem_unlink("death");
 	sem_unlink("sync");
 	sem_unlink("var");
 	sem_unlink("print");
+	sem_unlink("time");
 	semaphores->forks = sem_open("forks", O_CREAT, 0644, total_philo);
 	if (semaphores->forks == SEM_FAILED)
 		return (close_sem_error(semaphores));
@@ -65,6 +68,9 @@ int	init_semaphores(t_sem *semaphores, int total_philo)
 		return (close_sem_error(semaphores));
 	semaphores->print = sem_open("print", O_CREAT, 0644, 1);
 	if (semaphores->print == SEM_FAILED)
+		return (close_sem_error(semaphores));
+	semaphores->time = sem_open("time", O_CREAT, 0644, 1);
+	if (semaphores->time == SEM_FAILED)
 		return (close_sem_error(semaphores));
 	return (SUCCESS);
 }
