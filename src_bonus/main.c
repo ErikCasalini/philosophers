@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 08:23:55 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/01 12:34:06 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,12 +163,12 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 
 	args.philo = philo;
 	args.semaphores = semaphores;
-	if (create_threads(&args, &death_tracker, &death_flag_setter) == ERROR)
-		subprocess_close_sem_exit(semaphores);
 	sem_wait(semaphores->sync);
-	// sem_post(semaphores->sync);
 	sem_close(semaphores->sync);
 	gettimeofday(&philo->start_time, NULL);
+	philo->started_eat = philo->start_time;
+	if (create_threads(&args, &death_tracker, &death_flag_setter) == ERROR)
+		subprocess_close_sem_exit(semaphores);
 	if (is_even(philo->philo_num))
 		if (start_sleeping(philo, semaphores) == ERROR)
 			subprocess_close_sem_exit(semaphores);
@@ -221,6 +221,6 @@ int	main(int argc, char *argv[])
 	if (child_pid == CHILD)
 		philo_routine_and_exit(&philo, &semaphores);
 	post_sem_sync(semaphores.sync, philo.total_philo);
-	wait_children(philo.philo_num);
+	wait_children(philo.total_philo);
 	close_semaphores(&semaphores);
 }
