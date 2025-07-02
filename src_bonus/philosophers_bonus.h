@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:55 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 08:27:27 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 14:03:41 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,6 @@ typedef struct s_sem
 	sem_t	*forks;
 	sem_t	*death_occurred;
 	sem_t	*death_flag;
-	sem_t	*check_death;
-	sem_t	*sync;
 	sem_t	*print;
 	sem_t	*time;
 }				t_sem;
