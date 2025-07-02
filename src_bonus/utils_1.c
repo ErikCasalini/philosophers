@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 14:15:53 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 08:26:59 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 09:34:23 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,12 @@ int	is_death_flag(t_philo *philo, t_sem *semaphores)
 
 int	semlock_printf(char *str, t_philo *philo, t_sem *semaphores)
 {
-	if (is_death_flag(philo, semaphores))
-		return (SUCCESS);
 	sem_wait(semaphores->print);
+	if (is_death_flag(philo, semaphores))
+	{
+		sem_post(semaphores->print);
+		return (SUCCESS);
+	}
 	if (printf(str, curr_timestamp(philo->start_time, semaphores->time), philo->philo_num) < 0)
 		{
 			sem_wait(semaphores->death_flag);

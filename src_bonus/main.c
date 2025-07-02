@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 09:28:26 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 10:04:04 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,18 +49,21 @@ void *death_tracker_routine(void *arg_lst)
 		ms_diff = get_ms_diff(args->philo->started_eat, current_time);
 		if (ms_diff >= args->philo->tt_die)
 		{
-			sem_post(args->semaphores->death_occurred);
 			sem_wait(args->semaphores->print);
 			// sem_wait(args->semaphores->death_flag);
 			// if (!args->philo->death_flag) // Si jamais printef a precedamment echoué le flag est deja la, et on ne doit pas ecrire
 			// sem_post(args->semaphores->death_flag);
 			// semlock_printf("%lld %d died\n", args->philo, args->semaphores);
-			if (!args->philo->death_flag)
+			if (!is_death_flag(args->philo, args->semaphores))
 				printf("%lld %d died\n", curr_timestamp(args->philo->start_time, args->semaphores->time), args->philo->philo_num);
+			sem_post(args->semaphores->death_occurred);
 			// sem_wait(args->semaphores->death_flag);
 			// args->philo->death_flag = 1;
 			// sem_post(args->semaphores->death_flag);
-			usleep(3000);
+			if (args->philo->total_philo >= 20)
+				usleep(20 * args->philo->total_philo);
+			else
+				usleep(400);
 			sem_post(args->semaphores->print);
 			return (NULL);
 		}
