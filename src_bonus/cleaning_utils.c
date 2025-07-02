@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleaning_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 13:36:05 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 14:01:37 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 16:54:33 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,4 +26,5 @@ void	close_semaphores(t_sem *semaphores)
 	unlink_close_sem("death_flag", semaphores->death_flag);
 	unlink_close_sem("print", semaphores->print);
 	unlink_close_sem("time", semaphores->time);
+	unlink_close_sem("meals_eaten", semaphores->meals_eaten);
 }

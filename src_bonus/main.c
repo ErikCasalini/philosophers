@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 15:04:40 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 17:07:53 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ long long	hunger_counter(struct timeval last_meal, t_sem *semaphores)
 {
 	struct timeval	current_time;
 	long long		ms_diff;
-	
+
 	semlock_gettimeofday(&current_time, semaphores->time);
 	return (get_ms_diff(last_meal, current_time));
 }
@@ -52,28 +52,19 @@ void *death_tracker_routine(void *arg_lst)
 	args = (t_threads_args *)arg_lst;
 	while (1)
 	{
-		// sem_wait(args->semaphores->death_flag);
 		if (hunger_counter(args->philo->started_eat, args->semaphores) >= args->philo->tt_die)
 		{
 			sem_wait(args->semaphores->print);
-			// sem_wait(args->semaphores->death_flag);
-			// if (!args->philo->death_flag) // Si jamais printef a precedamment echoué le flag est deja la, et on ne doit pas ecrire
-			// sem_post(args->semaphores->death_flag);
-			// semlock_printf("%lld %d died\n", args->philo, args->semaphores);
-			if (!is_death_flag(args->philo, args->semaphores))
+			if (!is_death_flag(args->philo, args->semaphores) && (args->philo->eat_max == -1 || args->philo->meals_eaten < args->philo->eat_max))
 				printf("%lld %d died\n", curr_timestamp(args->philo->start_time, args->semaphores->time), args->philo->philo_num);
 			sem_post(args->semaphores->death_occurred);
-			// sem_wait(args->semaphores->death_flag);
-			// args->philo->death_flag = 1;
-			// sem_post(args->semaphores->death_flag);
 			if (args->philo->total_philo >= 20)
-				usleep(20 * args->philo->total_philo);
+				usleep(80 * args->philo->total_philo);
 			else
 				usleep(400);
 			sem_post(args->semaphores->print);
 			return (NULL);
 		}
-		// sem_post(args->semaphores->death_flag);
 		usleep(250);
 	}
 	return ((void *)SUCCESS);
@@ -86,9 +77,16 @@ void *death_flag_setter_routine(void *arg_lst)
 	args = (t_threads_args *)arg_lst;
 	sem_wait(args->semaphores->death_occurred);
 	sem_post(args->semaphores->death_occurred);
-	sem_wait(args->semaphores->death_flag);
-	args->philo->death_flag = 1;
-	sem_post(args->semaphores->death_flag);
+	sem_wait(args->semaphores->meals_eaten);
+	if (args->philo->eat_max == -1 || args->philo->meals_eaten < args->philo->eat_max)
+	{
+		sem_post(args->semaphores->meals_eaten);
+		sem_wait(args->semaphores->death_flag);
+		args->philo->death_flag = 1;
+		sem_post(args->semaphores->death_flag);
+	}
+	else
+		sem_post(args->semaphores->meals_eaten);
 	return (NULL);
 }
 
@@ -110,15 +108,14 @@ int create_threads(t_threads_args *args, pthread_t *death_tracker, pthread_t *de
 
 void subprocess_close_sem_exit(t_sem *semaphores, pthread_t thread_1, pthread_t thread_2)
 {
-	void *return_value;
-
-	pthread_join(thread_1, &return_value);
+	pthread_join(thread_1, NULL);
 	pthread_join(thread_2, NULL);
 	sem_close(semaphores->death_occurred);
 	sem_close(semaphores->forks);
 	sem_close(semaphores->death_flag);
 	sem_close(semaphores->print);
 	sem_close(semaphores->time);
+	sem_close(semaphores->meals_eaten);
 	exit(0);
 }
 
@@ -164,7 +161,9 @@ int	start_eating(t_philo *philo, t_sem *semaphores)
 	}
 	sem_post(semaphores->forks);
 	sem_post(semaphores->forks);
+	sem_wait(semaphores->meals_eaten);
 	philo->meals_eaten++;
+	sem_post(semaphores->meals_eaten);
 	return (SUCCESS);
 }
 
@@ -185,12 +184,17 @@ int	start_sleeping(t_philo *philo, t_sem *semaphores)
 
 void	terminate_if_eat_max(t_philo *philo, t_sem *semaphores, pthread_t thread_1, pthread_t thread_2)
 {
+	sem_wait(semaphores->meals_eaten);
 	if (philo->eat_max != -1
 			&& philo->meals_eaten == philo->eat_max)
 		{
+			sem_post(semaphores->meals_eaten);
+			usleep((philo->tt_eat + philo->tt_sleep) * 1000);
 			sem_post(semaphores->death_occurred);
 			subprocess_close_sem_exit(semaphores, thread_1, thread_2);
 		}
+	else
+		sem_post(semaphores->meals_eaten);
 }
 
 void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
@@ -224,7 +228,7 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 int	create_forks(t_philo *philo, t_sem *semaphores)
 {
 	pid_t	child_pid;
-	
+
 	child_pid = 1;
 	while (child_pid != CHILD && ++philo->philo_num <= philo->total_philo)
 	{
@@ -241,12 +245,12 @@ int	create_forks(t_philo *philo, t_sem *semaphores)
 		philo_routine_and_exit(philo, semaphores);
 	return (philo->philo_num - 1);
 }
-	
+
 int	main(int argc, char *argv[])
 {
 	t_philo	philo;
 	t_sem	semaphores;
-	
+
 	if (argc < 5 || argc > 6)
 		exit_bad_argument();
 	if (init_philo_struct(argc, argv, &philo) == ERROR)
