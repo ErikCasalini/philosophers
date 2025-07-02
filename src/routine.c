@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 11:05:12 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/28 11:52:59 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 13:59:26 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,9 @@ void	*routine(void *args_struct)
 		if (start_thinking(args) == ERROR)
 			return (NULL);
 		if (start_eating(args) == ERROR)
+			return (NULL);
+		if (args->philo->eat_max != -1
+			&& args->meals_eaten == args->philo->eat_max)
 			return (NULL);
 		if (start_sleeping(args) == ERROR)
 			return (NULL);
