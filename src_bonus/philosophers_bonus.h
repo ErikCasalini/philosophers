@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:55 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 17:33:20 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 08:27:27 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,10 @@ typedef struct s_philo
 typedef struct s_sem
 {
 	sem_t	*forks;
-	sem_t	*death;
+	sem_t	*death_occurred;
+	sem_t	*death_flag;
+	sem_t	*check_death;
 	sem_t	*sync;
-	sem_t	*var;
 	sem_t	*print;
 	sem_t	*time;
 }				t_sem;

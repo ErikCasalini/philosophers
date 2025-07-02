@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 14:15:53 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/01 17:30:25 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 08:26:59 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,13 @@ long long	curr_timestamp(struct timeval start_time, sem_t *time)
 
 int	is_death_flag(t_philo *philo, t_sem *semaphores)
 {
-	sem_wait(semaphores->var);
+	sem_wait(semaphores->death_flag);
 	if (philo->death_flag == 1)
 	{
-		sem_post(semaphores->var);
+		sem_post(semaphores->death_flag);
 		return (1);
 	}
-	sem_post(semaphores->var);
+	sem_post(semaphores->death_flag);
 	return (0);
 }
 
@@ -51,10 +51,10 @@ int	semlock_printf(char *str, t_philo *philo, t_sem *semaphores)
 	sem_wait(semaphores->print);
 	if (printf(str, curr_timestamp(philo->start_time, semaphores->time), philo->philo_num) < 0)
 		{
-			sem_wait(semaphores->var);
+			sem_wait(semaphores->death_flag);
 			philo->death_flag = 1;
-			sem_post(semaphores->var);
-			sem_post(semaphores->death);
+			sem_post(semaphores->death_flag);
+			sem_post(semaphores->death_occurred);
 		}
 	sem_post(semaphores->print);
 	return (SUCCESS);
