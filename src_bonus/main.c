@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 14:03:35 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 15:04:40 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ int	wait_children(int children)
 {
 	while (children)
 	{
-		waitpid(0, NULL, 0);
+		if (waitpid(0, NULL, 0) == FAILURE)
+			printf("wait fail");
 		children--;
 	}
 	return (SUCCESS);
@@ -73,7 +74,7 @@ void *death_tracker_routine(void *arg_lst)
 			return (NULL);
 		}
 		// sem_post(args->semaphores->death_flag);
-		// usleep(250);
+		usleep(250);
 	}
 	return ((void *)SUCCESS);
 }
@@ -182,6 +183,16 @@ int	start_sleeping(t_philo *philo, t_sem *semaphores)
 	return (SUCCESS);
 }
 
+void	terminate_if_eat_max(t_philo *philo, t_sem *semaphores, pthread_t thread_1, pthread_t thread_2)
+{
+	if (philo->eat_max != -1
+			&& philo->meals_eaten == philo->eat_max)
+		{
+			sem_post(semaphores->death_occurred);
+			subprocess_close_sem_exit(semaphores, thread_1, thread_2);
+		}
+}
+
 void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 {
 	pthread_t		death_tracker;
@@ -198,54 +209,54 @@ void	philo_routine_and_exit(t_philo *philo, t_sem *semaphores)
 			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 	while (1)
 	{
-		if (philo->eat_max != -1
-			&& philo->meals_eaten == philo->eat_max)
-		{
-			sem_post(semaphores->death_occurred);
-			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
-		}
+		terminate_if_eat_max(philo, semaphores, death_tracker, death_flag_setter);
 		if (start_thinking(philo, semaphores) == ERROR)
 			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 		if (start_eating(philo, semaphores) == ERROR)
 			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
-		if (philo->eat_max != -1
-			&& philo->meals_eaten == philo->eat_max) // ADD THIS TO MAIN PROJECT
-		{
-			sem_post(semaphores->death_occurred);
-			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
-		}
+		terminate_if_eat_max(philo, semaphores, death_tracker, death_flag_setter);
 		if (start_sleeping(philo, semaphores) == ERROR)
 			subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 	}
 	subprocess_close_sem_exit(semaphores, death_tracker, death_flag_setter);
 }
 
-int	main(int argc, char *argv[])
+int	create_forks(t_philo *philo, t_sem *semaphores)
 {
-	t_philo	philo;
 	pid_t	child_pid;
-	t_sem	semaphores;
-
-	if (argc < 5 || argc > 6)
-		exit_bad_argument();
-	if (init_philo_struct(argc, argv, &philo) == ERROR)
-		exit_bad_argument();
-	if (init_semaphores(&semaphores, philo.total_philo) == ERROR)
-		exit_print_error("Semaphores creation error\n", 2);
+	
 	child_pid = 1;
-	gettimeofday(&philo.start_time, NULL);
-	while (child_pid != CHILD && ++philo.philo_num <= philo.total_philo)
+	while (child_pid != CHILD && ++philo->philo_num <= philo->total_philo)
 	{
 		child_pid = fork();
 		if (child_pid == FAILURE)
 		{
-			ft_putstr_fd("Fork error\n", 2);
-			philo.philo_num--;
+			ft_putstr_fd("Fork error: no more philosophers generated"
+					" and simulation will be interrupted\n", 2);
+			sem_post(semaphores->death_occurred);
 			break ;
 		}
 	}
 	if (child_pid == CHILD)
-		philo_routine_and_exit(&philo, &semaphores);
-	wait_children(philo.total_philo);
+		philo_routine_and_exit(philo, semaphores);
+	return (philo->philo_num - 1);
+}
+	
+int	main(int argc, char *argv[])
+{
+	t_philo	philo;
+	t_sem	semaphores;
+	
+	if (argc < 5 || argc > 6)
+		exit_bad_argument();
+	if (init_philo_struct(argc, argv, &philo) == ERROR)
+		exit_bad_argument();
+	if (philo.eat_max == 0)
+		return (SUCCESS);
+	if (gettimeofday(&philo.start_time, NULL) != SUCCESS)
+		exit_print_error("Warning: unable to get time of day\n", 2);
+	if (init_semaphores(&semaphores, philo.total_philo) == ERROR)
+		exit_print_error("Semaphores creation error\n", 2);
+	wait_children(create_forks(&philo, &semaphores));
 	close_semaphores(&semaphores);
 }
