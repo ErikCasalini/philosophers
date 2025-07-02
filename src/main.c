@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/29 17:04:03 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/02 14:12:24 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ int	main(int argc, char *argv[])
 	philo.total_philo = total_philo.value;
 	if (init_philo_struct(argc, argv, &philo) == ERROR)
 		exit_bad_argument();
+	if (philo.eat_max == 0)
+		return (0);
 	if (allocate_heap(&heap, total_philo.value) == ERROR)
 		free_heap_exit_err(&heap);
 	init_mutexes(&mutexes, heap.fork_mutexes, total_philo.value);
