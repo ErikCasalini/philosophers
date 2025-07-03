@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/29 17:00:34 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/03 14:41:00 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ int				ft_strlen(const char *s);
 
 /* FREE UTILS */
 void			free_heap(t_heap_allocated *heap);
-int				free_heap_exit_err(t_heap_allocated *heap);
+int				free_heap_exit_err(char *err_msg, t_heap_allocated *heap);
 
 /* ARGUMENTS ERRORS UTILS */
 void			exit_bad_argument(void);

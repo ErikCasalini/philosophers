@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:06 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/03 10:09:12 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/03 16:06:05 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int	main(int argc, char *argv[])
 	if (philo.eat_max == 0)
 		return (SUCCESS);
 	if (gettimeofday(&philo.start_time, NULL) != SUCCESS)
-		exit_print_error("Warning: unable to get time of day\n", 2);
+		exit_print_error("Unable to get time\n", 2);
 	if (init_semaphores(&semaphores, philo.total_philo) == ERROR)
 		exit_print_error("Semaphores creation error\n", 2);
 	wait_children(create_children(&philo, &semaphores));

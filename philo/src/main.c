@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 14:12:24 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/03 16:06:28 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,20 +23,23 @@ static int	print_error_set_flag(char *err_msg,
 {
 	pthread_mutex_lock(death_mutex);
 	philo->death_flag = 1;
-	ft_putstr_fd(err_msg, 2);
 	pthread_mutex_unlock(death_mutex);
+	ft_putstr_fd(err_msg, 2);
 	philo->return_value = ERROR;
 	return (return_value);
+}
+
+static void	print_error_exit(char *err_msg)
+{
+	ft_putstr_fd(err_msg, 2);
+	exit(EXIT_FAILURE);
 }
 
 int	create_threads(t_philo *philo,
 		t_mutexes *mutexes, int total_philo, t_heap_allocated *heap)
 {
 	int				philo_num;
-
-	if (gettimeofday(&philo->start_time, NULL) != SUCCESS)
-		return (print_error_set_flag("Warning: unable to get time of day\n",
-				0, philo, &mutexes->death_mutex));
+	
 	philo_num = 0;
 	pthread_mutex_lock(&mutexes->sync_mutex);
 	while (philo_num < total_philo)
@@ -62,27 +65,25 @@ int	create_threads(t_philo *philo,
 int	main(int argc, char *argv[])
 {
 	t_philo				philo;
-	t_intf				total_philo;
 	t_heap_allocated	heap;
 	t_mutexes			mutexes;
 
 	if (argc < 5 || argc > 6)
 		exit_bad_argument();
 	heap = (t_heap_allocated){NULL, NULL, NULL, NULL};
-	total_philo = ft_atoi_flag(argv[1]);
-	if (total_philo.flag == ERROR)
-		exit_bad_argument();
-	philo.total_philo = total_philo.value;
+	if (gettimeofday(&philo.start_time, NULL) != SUCCESS)
+		print_error_exit("Unable to get time\n");
 	if (init_philo_struct(argc, argv, &philo) == ERROR)
 		exit_bad_argument();
 	if (philo.eat_max == 0)
-		return (0);
-	if (allocate_heap(&heap, total_philo.value) == ERROR)
-		free_heap_exit_err(&heap);
-	init_mutexes(&mutexes, heap.fork_mutexes, total_philo.value);
+		return (EXIT_SUCCESS);
+	if (allocate_heap(&heap, philo.total_philo) == ERROR)
+		free_heap_exit_err("Memory allocation error\n", &heap);
+	if (init_mutexes(&mutexes, heap.fork_mutexes, philo.total_philo) == ERROR)
+		free_heap_exit_err("Mutexes init error\n", &heap);
 	join_threads(heap.thread_lst,
-		create_threads(&philo, &mutexes, total_philo.value, &heap));
-	destroy_mutexes(&mutexes, total_philo.value);
+		create_threads(&philo, &mutexes, philo.total_philo, &heap));
+	destroy_mutexes(&mutexes, philo.total_philo);
 	free_heap(&heap);
 	return (philo.return_value);
 }

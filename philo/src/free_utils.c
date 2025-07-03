@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:36:35 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/29 17:05:37 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/03 14:42:35 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ void	free_heap(t_heap_allocated *heap)
 	free(heap->fork_mutexes);
 }
 
-int	free_heap_exit_err(t_heap_allocated *heap)
+int	free_heap_exit_err(char *err_msg, t_heap_allocated *heap)
 {
 	free_heap(heap);
-	ft_putstr_fd("Memory allocation error\n", 2);
+	ft_putstr_fd(err_msg, 2);
 	exit(1);
 }
