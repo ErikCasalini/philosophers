@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   errors_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 08:45:41 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/06/30 17:11:39 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/03 10:04:58 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,4 +29,10 @@ int	print_err_return_err(char *err_msg)
 {
 	ft_putstr_fd(err_msg, 2);
 	return (ERROR);
+}
+
+void	exit_print_error(char *err_msg, int exit_value)
+{
+	ft_putstr_fd(err_msg, 2);
+	exit (exit_value);
 }

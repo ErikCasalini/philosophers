@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 14:15:53 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 09:34:23 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/03 10:13:50 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,14 @@ int	semlock_printf(char *str, t_philo *philo, t_sem *semaphores)
 		sem_post(semaphores->print);
 		return (SUCCESS);
 	}
-	if (printf(str, curr_timestamp(philo->start_time, semaphores->time), philo->philo_num) < 0)
-		{
-			sem_wait(semaphores->death_flag);
-			philo->death_flag = 1;
-			sem_post(semaphores->death_flag);
-			sem_post(semaphores->death_occurred);
-		}
+	if (printf(str, curr_timestamp(philo->start_time,
+				semaphores->time), philo->philo_num) < 0)
+	{
+		sem_wait(semaphores->death_flag);
+		philo->death_flag = 1;
+		sem_post(semaphores->death_flag);
+		sem_post(semaphores->death_occurred);
+	}
 	sem_post(semaphores->print);
 	return (SUCCESS);
 }

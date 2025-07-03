@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecasalin <ecasalin@42.fr>                  +#+  +:+       +#+        */
+/*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 16:19:55 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/02 16:51:21 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/03 10:14:39 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <sys/time.h>
 # include <semaphore.h>
+# include <pthread.h>
 
 # define FAILURE -1
 # define ERROR 1
@@ -71,8 +72,15 @@ typedef struct s_threads_args
 }				t_threads_args;
 
 /* INIT UTILS */
-int		init_philo_struct(int argc, char **argv, t_philo *philo);
-int		init_semaphores(t_sem *semaphores, int total_philo);
+int			init_philo_struct(int argc, char **argv, t_philo *philo);
+int			init_semaphores(t_sem *semaphores, int total_philo);
+
+/* THREADS CREATION */
+void		create_threads(t_threads_args *args,
+				pthread_t *d_tracker, pthread_t *d_setter);
+
+/* CHILDREN ROUTINE */
+void		philo_child_routine(t_philo *philo, t_sem *semaphores);
 
 /* UTILS */
 t_intf		ft_atoi_flag(char *str);
@@ -86,11 +94,14 @@ int			is_death_flag(t_philo *philo, t_sem *semaphores);
 int			is_even(int philo_num);
 
 /* CLEANING UTILS */
-void	unlink_close_sem(char *sem_name, sem_t *semaphores);
-void	close_semaphores(t_sem *semaphores);
+void		unlink_close_sem(char *sem_name, sem_t *semaphores);
+void		close_semaphores(t_sem *semaphores);
+void		subprocess_close_sem_exit(t_sem *semaphores,
+				pthread_t thread_1, pthread_t thread_2);
 
 /* PRINT ERRORS UTILS */
-void	exit_bad_argument(void);
-int		print_err_return_err(char *err_msg);
+void		exit_bad_argument(void);
+int			print_err_return_err(char *err_msg);
+void		exit_print_error(char *err_msg, int exit_value);
 
 #endif
