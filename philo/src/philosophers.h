@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:46:36 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/03 14:41:00 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/04 08:03:06 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ t_side_forks	init_forks_indexes(int current_philo, int philo_num);
 int				init_mutexes(t_mutexes *mutexes,
 					pthread_mutex_t *fork_mutexes, int total_philo);
 void			init_thread_args_struct(t_heap_allocated *heap,
-					t_philo *philo, int philo_num, int total_philo);
+					t_philo *philo, int philo_num, t_mutexes *mutexes);
 
 /* ROUTINE */
 void			*routine(void *args_struct);

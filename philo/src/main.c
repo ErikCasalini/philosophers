@@ -6,7 +6,7 @@
 /*   By: ecasalin <ecasalin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 15:39:44 by ecasalin          #+#    #+#             */
-/*   Updated: 2025/07/03 16:06:28 by ecasalin         ###   ########.fr       */
+/*   Updated: 2025/07/04 08:20:27 by ecasalin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,15 @@ static void	print_error_exit(char *err_msg)
 }
 
 int	create_threads(t_philo *philo,
-		t_mutexes *mutexes, int total_philo, t_heap_allocated *heap)
+		t_mutexes *mutexes, t_heap_allocated *heap)
 {
 	int				philo_num;
-	
+
 	philo_num = 0;
 	pthread_mutex_lock(&mutexes->sync_mutex);
-	while (philo_num < total_philo)
+	while (philo_num < philo->total_philo)
 	{
-		heap->thread_args[philo_num].mutexes = mutexes;
-		init_thread_args_struct(heap, philo, philo_num, total_philo);
+		init_thread_args_struct(heap, philo, philo_num, mutexes);
 		if (pthread_create(&heap->thread_lst[philo_num],
 				NULL,
 				routine,
@@ -82,7 +81,7 @@ int	main(int argc, char *argv[])
 	if (init_mutexes(&mutexes, heap.fork_mutexes, philo.total_philo) == ERROR)
 		free_heap_exit_err("Mutexes init error\n", &heap);
 	join_threads(heap.thread_lst,
-		create_threads(&philo, &mutexes, philo.total_philo, &heap));
+		create_threads(&philo, &mutexes, &heap));
 	destroy_mutexes(&mutexes, philo.total_philo);
 	free_heap(&heap);
 	return (philo.return_value);
